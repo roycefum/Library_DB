@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse Patrons</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Browse Patrons</h1>
+    <table id="patronsTable">
+        <thead>
+            <tr>
+                <th>Patron ID</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Email</th>
+                <th>Membership Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Dynamic data rows will be inserted here -->
+        </tbody>
+    </table>
+
+    <h2>Add New Patron</h2>
+    <form id="addPatronForm">
+        <label for="firstName">First Name:</label><br>
+        <input type="text" id="firstName" name="firstName" required><br>
+        <label for="lastName">Last Name:</label><br>
+        <input type="text" id="lastName" name="lastName" required><br>
+        <label for="email">Email:</label><br>
+        <input type="email" id="email" name="email" required><br>
+        <label for="membershipDate">Membership Date:</label><br>
+        <input type="date" id="membershipDate" name="membershipDate" required><br>
+        <button type="button" onclick="addPatron()">Submit</button>
+    </form>
+
+<!-- Sample Data -->
+    <script>
+        const patrons = [
+            {
+                patronID: 1,
+                firstName: 'Kareem',
+                lastName: 'Berumen',
+                email: 'berumenk@example.com',
+                membershipDate: '2024-05-07'
+            },
+            {
+                patronID: 2,
+                firstName: 'Marcus',
+                lastName: 'Royce-Fulton',
+                email: 'mroyce@example.com',
+                membershipDate: '2024-01-15'
+            },
+            {
+                patronID: 3,
+                firstName: 'Alice',
+                lastName: 'Johnson',
+                email: 'alicej@example.com',
+                membershipDate: '2024-03-22'
+            }
+        ];
+
+        function populateTable() {
+            const tableBody = document.getElementById('patronsTable').getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = '';
+            patrons.forEach(patron => {
+                const row = tableBody.insertRow();
+                row.innerHTML = `
+                    <td>${patron.patronID}</td>
+                    <td>${patron.firstName}</td>
+                    <td>${patron.lastName}</td>
+                    <td>${patron.email}</td>
+                    <td>${patron.membershipDate}</td>
+                    <td>
+                        <button onclick="window.location.href='edit_pages/edit_patron.html?patronID=${patron.patronID}'">Edit</button>
+                        <button onclick="deletePatron('${patron.patronID}')">Delete</button>
+                    </td>
+                `;
+            });
+        }
+
+        function addPatron() {
+            const form = document.getElementById('addPatronForm');
+            const newPatron = {
+                patronID: patrons.length + 1, // Simulating auto-increment
+                firstName: form.firstName.value,
+                lastName: form.lastName.value,
+                email: form.email.value,
+                membershipDate: form.membershipDate.value
+            };
+            patrons.push(newPatron);
+            populateTable();
+            form.reset();
+        }
+
+    function deletePatron(patronID) {
+        const index = patrons.findIndex(p => p.patronID.toString() === patronID.toString());
+        if (index > -1) {
+            patrons.splice(index, 1);
+            populateTable();
+            console.log("Patron with ID:", patronID, "has been deleted.");
+        } else {
+            console.log("Patron with ID:", patronID, "not found.");
+        }
+    }
+
+
+        window.onload = populateTable;
+    </script>
+</body>
+</html>

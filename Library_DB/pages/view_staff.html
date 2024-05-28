@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Staff Members</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>View Staff Members</h1>
+    <table id="staffTable">
+        <thead>
+            <tr>
+                <th>Staff ID</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Position</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Dynamic staff rows will be inserted here -->
+        </tbody>
+    </table>
+
+
+<!-- Sample Data -->
+<script>
+    const staffMembers = [
+        {
+            staffId: 1,
+            firstName: 'John',
+            lastName: 'Doe',
+            position: 'Librarian'
+        },
+        {
+            staffId: 2,
+            firstName: 'Jane',
+            lastName: 'Smith',
+            position: 'Assistant Librarian'
+        },
+        {
+            staffId: 3,
+            firstName: 'Alice',
+            lastName: 'Johnson',
+            position: 'Archivist'
+        }
+    ];
+
+    function populateTable() {
+        const tableBody = document.getElementById('staffTable').getElementsByTagName('tbody')[0];
+        tableBody.innerHTML = '';
+        staffMembers.forEach(staff => {
+            const row = tableBody.insertRow();
+            row.innerHTML = `
+                <td>${staff.staffId}</td>
+                <td>${staff.firstName}</td>
+                <td>${staff.lastName}</td>
+                <td>${staff.position}</td>
+                <td>
+                    <button onclick="window.location.href='edit_pages/edit_staff.html?staffId=${staff.staffId}'">Edit</button>
+                    <button onclick="deleteStaff('${staff.staffId}')">Delete</button>
+                </td>
+            `;
+        });
+    }
+
+    window.onload = populateTable;
+
+    function deleteStaff(staffId) {
+        console.log(`Attempting to delete staff with ID: ${staffId}`);
+        const index = staffMembers.findIndex(staff => staff.staffId.toString() === staffId.toString());
+        if (index > -1) {
+            staffMembers.splice(index, 1);
+            populateTable();
+            console.log("Staff member with ID:", staffId, "has been successfully deleted.");
+        } else {
+            console.log("Staff member with ID:", staffId, "not found.");
+        }
+    }
+</script>
+
+</body>
+</html>

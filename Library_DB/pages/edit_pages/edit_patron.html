@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Patron</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <h1>Edit Patron</h1>
+    <form id="editPatronForm">
+        <label for="firstName">First Name:</label><br>
+        <input type="text" id="firstName" name="firstName" required><br>
+        <label for="lastName">Last Name:</label><br>
+        <input type="text" id="lastName" name="lastName" required><br>
+        <label for="email">Email:</label><br>
+        <input type="email" id="email" name="email" required><br>
+        <label for="membershipDate">Membership Date:</label><br>
+        <input type="date" id="membershipDate" name="membershipDate" required><br>
+        <button type="button" onclick="updatePatron()">Update</button>
+    </form>
+
+    <script>
+        function fetchPatronDetails() {
+            const patronID = new URLSearchParams(window.location.search).get('patronID');
+            console.log(`Fetch details for patron ID: ${patronID}`);
+            // Fetch and populate form data here
+        }
+
+        function updatePatron() {
+            console.log("Update patron details...");
+            // Logic to handle patron update
+        }
+
+        window.onload = fetchPatronDetails;
+    </script>
+</body>
+</html>

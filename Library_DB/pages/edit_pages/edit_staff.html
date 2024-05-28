@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Staff Member</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <h1>Edit Staff Member</h1>
+    <form id="editStaffForm">
+        <label for="firstName">First Name:</label><br>
+        <input type="text" id="firstName" name="firstName" required><br>
+        <label for="lastName">Last Name:</label><br>
+        <input type="text" id="lastName" name="lastName" required><br>
+        <label for="position">Position:</label><br>
+        <input type="text" id="position" name="position"><br><br>
+        <button type="button" onclick="updateStaff()">Update</button>
+    </form>
+
+<script>
+    function fetchStaffDetails() {
+        const staffId = new URLSearchParams(window.location.search).get('staffId');
+        console.log(`Fetch details for staff ID: ${staffId}`);
+        // Simulate fetching data for the form here
+    }
+
+    function updateStaff() {
+        console.log("Update staff details...");
+        // Logic to handle staff update
+    }
+
+    window.onload = fetchStaffDetails;
+</script>
+</body>
+</html>

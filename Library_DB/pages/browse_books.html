@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse Books</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Browse Books</h1>
+    <table id="booksTable">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Author</th>
+                <th>ISBN</th>
+                <th>Published Year</th>
+                <th>Genre</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Data rows will be inserted here dynamically -->
+        </tbody>
+    </table>
+    <h2>Add New Book</h2>
+    <form id="addBookForm">
+        <label for="title">Title:</label><br>
+        <input type="text" id="title" name="title" required><br>
+        <label for="author">Author:</label><br>
+        <input type="text" id="author" name="author"><br>
+        <label for="isbn">ISBN:</label><br>
+        <input type="text" id="isbn" name="isbn" required><br>
+        <label for="publishedYear">Published Year:</label><br>
+        <input type="number" id="publishedYear" name="publishedYear" required><br>
+        <label for="genre">Genre:</label><br>
+        <input type="text" id="genre" name="genre"><br><br>
+        <button type="button" onclick="addBook()">Submit</button>
+    </form>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        fetchBooks();
+    });
+
+    function fetchBooks() {
+        fetch('http://classwork.engr.oregonstate.edu:9125/api/books')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(books => populateTable(books))
+            .catch(error => console.error('Error fetching books:', error));
+    }
+
+
+    function populateTable(books) {
+        const tableBody = document.getElementById('booksTable').getElementsByTagName('tbody')[0];
+        tableBody.innerHTML = '';
+        books.forEach(book => {
+            const row = tableBody.insertRow();
+            row.innerHTML = `
+                <td>${book.title}</td>
+                <td>${book.author}</td>
+                <td>${book.isbn}</td>
+                <td>${book.publishedYear}</td>
+                <td>${book.genre}</td>
+                <td>
+                    <button onclick="window.location.href='edit_pages/edit_book.html?isbn=${book.isbn}'">Edit</button>
+                    <button onclick="deleteBook('${book.isbn}')">Delete</button>
+                </td>
+            `;
+        });
+    }
+
+    function addBook() {
+        const form = document.getElementById('addBookForm');
+        const formData = {
+            title: form.title.value,
+            author: form.author.value,
+            isbn: form.isbn.value,
+            publishedYear: form.publishedYear.value,
+            genre: form.genre.value
+        };
+        fetch('http://classwork.engr.oregonstate.edu:9125/api/books', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            fetchBooks(); // Refresh the book list
+        })
+        .catch(error => console.error('Error adding book:', error));
+        form.reset();
+    }
+
+    function deleteBook(isbn) {
+        fetch(`http://classwork.engr.oregonstate.edu:9125/api/books/${isbn}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            fetchBooks(); // Refresh the book list
+        })
+        .catch(error => console.error('Error deleting book:', error));
+    }
+</script>
+
+</body>
+</html>

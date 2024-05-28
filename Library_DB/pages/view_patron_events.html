@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Patron Events</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>View Patron Events</h1>
+    <table id="eventsTable">
+        <thead>
+            <tr>
+                <th>Event ID</th>
+                <th>Event Name</th>
+                <th>Event Date</th>
+                <th>Description</th>
+                <th>Attendance</th>
+                <th>Staff ID</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Dynamic event rows will be inserted here -->
+        </tbody>
+    </table>
+    <h2>Add New Event</h2>
+    <form id="addEventForm">
+        <label for="eventName">Event Name:</label><br>
+        <input type="text" id="eventName" name="eventName" required><br>
+        <label for="eventDate">Event Date:</label><br>
+        <input type="datetime-local" id="eventDate" name="eventDate" required><br>
+        <label for="description">Description:</label><br>
+        <textarea id="description" name="description"></textarea><br>
+        <label for="attendance">Attendance:</label><br>
+        <input type="number" id="attendance" name="attendance"><br>
+        <label for="staffId">Staff ID:</label><br>
+        <input type="number" id="staffId" name="staffId" required><br>
+        <button type="button" onclick="addEvent()">Submit</button>
+    </form>
+
+
+<!-- Sample Data -->
+<script>
+    const events = [
+        {
+            eventId: 1,
+            eventName: 'Summer Reading Kickoff',
+            eventDate: '2024-06-01 14:00',
+            description: 'Launch into summer reading with activities and fun!',
+            attendance: 150,
+            staffId: 12
+        },
+        {
+            eventId: 2,
+            eventName: 'Author Visit',
+            eventDate: '2024-06-15 18:00',
+            description: 'Meet your favorite author and get your books signed!',
+            attendance: 200,
+            staffId: 9
+        },
+        {
+            eventId: 3,
+            eventName: 'Poetry Night',
+            eventDate: '2024-07-20 20:00',
+            description: 'Enjoy an evening of poetry readings and open mic sessions.',
+            attendance: 100,
+            staffId: 5
+        }
+    ];
+
+    function populateTable() {
+        const tableBody = document.getElementById('eventsTable').getElementsByTagName('tbody')[0];
+        tableBody.innerHTML = ''; // Clear previous entries
+        events.forEach(event => {
+            const row = tableBody.insertRow();
+            row.innerHTML = `
+                <td>${event.eventId}</td>
+                <td>${event.eventName}</td>
+                <td>${event.eventDate}</td>
+                <td>${event.description}</td>
+                <td>${event.attendance}</td>
+                <td>${event.staffId}</td>
+                <td>
+                    <button onclick="window.location.href='edit_pages/edit_patron_event.html?eventId=${event.eventId}'">Edit</button>
+                    <button onclick="deleteEvent('${event.eventId}')">Delete</button>
+                </td>
+            `;
+        });
+    }
+
+    function addEvent() {
+        const form = document.getElementById('addEventForm');
+        const newEvent = {
+            eventId: events.length + 1,
+            eventName: form.eventName.value,
+            eventDate: form.eventDate.value,
+            description: form.description.value,
+            attendance: parseInt(form.attendance.value),
+            staffId: parseInt(form.staffId.value)
+        };
+        events.push(newEvent);
+        populateTable();
+        form.reset();
+    }
+
+    function deleteEvent(eventId) {
+        const index = events.findIndex(event => event.eventId.toString() === eventId.toString());
+        if (index > -1) {
+            events.splice(index, 1);
+            populateTable();
+            console.log("Event with ID:", eventId, "has been deleted.");
+        } else {
+            console.log("Event with ID:", eventId, "not found.");
+        }
+    }
+
+
+    window.onload = populateTable;
+</script>
+
+</body>
+</html>

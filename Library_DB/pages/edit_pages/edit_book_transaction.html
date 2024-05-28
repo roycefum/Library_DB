@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Book Transaction</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <h1>Edit Book Transaction</h1>
+    <form id="editTransactionForm">
+        <label for="patronID">Patron ID:</label><br>
+        <input type="number" id="patronID" name="patronID" required><br>
+        <label for="numberBooks">Number of Books:</label><br>
+        <input type="number" id="numberBooks" name="numberBooks" required><br>
+        <label for="staffID">Staff ID:</label><br>
+        <input type="number" id="staffID" name="staffID" required><br>
+        <label for="date">Date:</label><br>
+        <input type="date" id="date" name="date" required><br>
+        <button type="button" onclick="updateTransaction()">Update</button>
+    </form>
+
+    <script>
+        // Placeholder for a transactions array on a real application
+        const transactions = [
+            { transactionID: 1001, patronID: 501, numberOfBooks: 3, staffID: 102, date: '2024-04-15' },
+            { transactionID: 1002, patronID: 502, numberOfBooks: 1, staffID: 103, date: '2024-04-16' },
+            { transactionID: 1003, patronID: 503, numberOfBooks: 5, staffID: 104, date: '2024-04-17' }
+        ];
+
+        function fetchTransactionDetails() {
+            const transactionID = new URLSearchParams(window.location.search).get('transactionID');
+            const transaction = transactions.find(t => t.transactionID == transactionID);
+            if (transaction) {
+                document.getElementById('patronID').value = transaction.patronID;
+                document.getElementById('numberBooks').value = transaction.numberOfBooks;
+                document.getElementById('staffID').value = transaction.staffID;
+                document.getElementById('date').value = transaction.date;
+            } else {
+                console.log('Transaction not found');
+            }
+        }
+
+        function updateTransaction() {
+            console.log("Update transaction details...");
+            // Logic to handle transaction update on a real server
+        }
+
+        window.onload = fetchTransactionDetails;
+    </script>
+</body>
+</html>

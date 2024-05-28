@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Patron Events Attendance</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>View Patron Events Attendance</h1>
+    <table id="attendanceTable">
+        <thead>
+            <tr>
+                <th>Event Detail ID</th>
+                <th>Patron ID</th>
+                <th>Event ID</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Dynamic rows will be inserted here -->
+        </tbody>
+    </table>
+    <h2>Add New Attendance</h2>
+    <form id="addAttendanceForm">
+        <label for="patronID">Patron ID:</label><br>
+        <input type="number" id="patronID" name="patronID" required><br>
+        <label for="eventID">Event ID:</label><br>
+        <input type="number" id="eventID" name="eventID" required><br>
+        <button type="button" onclick="addAttendance()">Submit</button>
+    </form>
+
+
+<!-- Sample Data -->
+    <script>
+        const attendances = [
+            { eventDetailID: 101, patronID: 2001, eventID: 301 },
+            { eventDetailID: 102, patronID: 2002, eventID: 302 },
+            { eventDetailID: 103, patronID: 2003, eventID: 303 }
+        ];
+
+        function populateTable() {
+            const tableBody = document.getElementById('attendanceTable').getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = ''; // Clear previous entries
+            attendances.forEach(attendance => {
+                const row = tableBody.insertRow();
+                row.innerHTML = `
+                    <td>${attendance.eventDetailID}</td>
+                    <td>${attendance.patronID}</td>
+                    <td>${attendance.eventID}</td>
+                    <td>
+                        <button onclick="window.location.href='edit_pages/edit_patron_attendance.html?eventDetailID=${attendance.eventDetailID}'">Edit</button>
+                        <button onclick="deleteAttendance('${attendance.eventDetailID}')">Delete</button>
+                    </td>
+                `;
+            });
+        }
+
+        function addAttendance() {
+            const form = document.getElementById('addAttendanceForm');
+            const newAttendance = {
+                eventDetailID: Math.max(...attendances.map(a => a.eventDetailID)) + 1,
+                patronID: parseInt(form.patronID.value),
+                eventID: parseInt(form.eventID.value)
+            };
+            attendances.push(newAttendance);
+            populateTable();
+            form.reset();
+        }
+
+        function deleteAttendance(eventDetailID) {
+            const index = attendances.findIndex(a => a.eventDetailID.toString() === eventDetailID.toString());
+            if (index > -1) {
+                attendances.splice(index, 1);
+                populateTable();
+            } else {
+                console.log("Attendance with Event Detail ID:", eventDetailID, "not found.");
+            }
+        }
+
+
+        window.onload = populateTable;
+    </script>
+</body>
+</html>

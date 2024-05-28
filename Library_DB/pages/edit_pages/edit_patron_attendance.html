@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Patron Event Attendance</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <h1>Edit Patron Event Attendance</h1>
+    <form id="editAttendanceForm">
+        <label for="patronID">Patron ID:</label><br>
+        <input type="number" id="patronID" name="patronID" required><br>
+        <label for="eventID">Event ID:</label><br>
+        <input type="number" id="eventID" name="eventID" required><br>
+        <button type="button" onclick="updateAttendance()">Update</button>
+    </form>
+
+    <script>
+        function fetchAttendanceDetails() {
+            const eventDetailID = new URLSearchParams(window.location.search).get('eventDetailID');
+            console.log(`Fetch details for Event Detail ID: ${eventDetailID}`);
+            // Ideally, fetch details from server and populate the form here
+        }
+
+        function updateAttendance() {
+            console.log("Update attendance details...");
+            // Logic to update attendance details on the server
+        }
+
+        window.onload = fetchAttendanceDetails;
+    </script>
+</body>
+</html>
