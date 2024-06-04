@@ -4,10 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>View Staff Members</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
+    <!-- Page title -->
     <h1>View Staff Members</h1>
+
+    <!-- Table to display staff member data -->
     <table id="staffTable">
         <thead>
             <tr>
@@ -19,64 +22,51 @@
             </tr>
         </thead>
         <tbody>
-            <!-- Dynamic staff rows will be inserted here -->
+            <!-- Dynamic staff rows will be inserted here via JavaScript -->
         </tbody>
     </table>
 
-
-<!-- Sample Data -->
 <script>
-    const staffMembers = [
-        {
-            staffId: 1,
-            firstName: 'John',
-            lastName: 'Doe',
-            position: 'Librarian'
-        },
-        {
-            staffId: 2,
-            firstName: 'Jane',
-            lastName: 'Smith',
-            position: 'Assistant Librarian'
-        },
-        {
-            staffId: 3,
-            firstName: 'Alice',
-            lastName: 'Johnson',
-            position: 'Archivist'
-        }
-    ];
+    // Fetch and populate the table with staff data on page load
+    window.onload = function() {
+        populateTable();
+    };
 
+    // Populate the table with staff data
     function populateTable() {
-        const tableBody = document.getElementById('staffTable').getElementsByTagName('tbody')[0];
-        tableBody.innerHTML = '';
-        staffMembers.forEach(staff => {
-            const row = tableBody.insertRow();
-            row.innerHTML = `
-                <td>${staff.staffId}</td>
-                <td>${staff.firstName}</td>
-                <td>${staff.lastName}</td>
-                <td>${staff.position}</td>
-                <td>
-                    <button onclick="window.location.href='edit_pages/edit_staff.html?staffId=${staff.staffId}'">Edit</button>
-                    <button onclick="deleteStaff('${staff.staffId}')">Delete</button>
-                </td>
-            `;
-        });
+        fetch('http://read-renaissance.com/api/staff')
+        .then(response => response.json())
+        .then(data => {
+            const tableBody = document.getElementById('staffTable').getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = ''; // Clear the table first
+            data.forEach(staff => {
+                const row = tableBody.insertRow();
+                row.innerHTML = `
+                    <td>${staff.staffId}</td>
+                    <td>${staff.firstName}</td>
+                    <td>${staff.lastName}</td>
+                    <td>${staff.position}</td>
+                    <td>
+                        <button onclick="window.location.href='edit_pages/edit_staff.html?staffId=${staff.staffId}'">Edit</button>
+                        <button onclick="deleteStaff('${staff.staffId}')">Delete</button>
+                    </td>
+                `;
+            });
+        })
+        .catch(error => console.error('Error loading staff data:', error));
     }
 
-    window.onload = populateTable;
-
+    // Function to delete a staff member
     function deleteStaff(staffId) {
-        console.log(`Attempting to delete staff with ID: ${staffId}`);
-        const index = staffMembers.findIndex(staff => staff.staffId.toString() === staffId.toString());
-        if (index > -1) {
-            staffMembers.splice(index, 1);
-            populateTable();
-            console.log("Staff member with ID:", staffId, "has been successfully deleted.");
-        } else {
-            console.log("Staff member with ID:", staffId, "not found.");
-        }
+        fetch(`http://read-renaissance.com/api/staff/${staffId}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(result => {
+            console.log(result); // Log the result for debugging
+            populateTable(); // Refresh the table after deletion
+        })
+        .catch(error => console.error('Error deleting staff member:', error));
     }
 </script>
 

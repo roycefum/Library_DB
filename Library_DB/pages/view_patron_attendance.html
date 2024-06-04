@@ -4,10 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>View Patron Events Attendance</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
+    <!-- Title of the page -->
     <h1>View Patron Events Attendance</h1>
+
+    <!-- Table to display events attendance -->
     <table id="attendanceTable">
         <thead>
             <tr>
@@ -18,9 +21,11 @@
             </tr>
         </thead>
         <tbody>
-            <!-- Dynamic rows will be inserted here -->
+            <!-- Dynamic rows for event attendance will be inserted here -->
         </tbody>
     </table>
+
+    <!-- Form to add new attendance record -->
     <h2>Add New Attendance</h2>
     <form id="addAttendanceForm">
         <label for="patronID">Patron ID:</label><br>
@@ -30,19 +35,26 @@
         <button type="button" onclick="addAttendance()">Submit</button>
     </form>
 
-
-<!-- Sample Data -->
     <script>
-        const attendances = [
-            { eventDetailID: 101, patronID: 2001, eventID: 301 },
-            { eventDetailID: 102, patronID: 2002, eventID: 302 },
-            { eventDetailID: 103, patronID: 2003, eventID: 303 }
-        ];
+        // Load event attendance data when the page loads
+        window.onload = function() {
+            fetchAttendances();
+        };
 
-        function populateTable() {
+        // Fetch event attendances from the server
+        function fetchAttendances() {
+            fetch('http://read-renaissance.com/api/attendances')
+                .then(response => response.json())
+                .then(data => populateTable(data))
+                .catch(error => console.error('Error fetching attendances:', error));
+        }
+
+        // Populate the table with attendance data
+        function populateTable(attendances) {
             const tableBody = document.getElementById('attendanceTable').getElementsByTagName('tbody')[0];
-            tableBody.innerHTML = ''; // Clear previous entries
+            tableBody.innerHTML = '';
             attendances.forEach(attendance => {
+                console.log(attendance); // Debugging log for attendance data
                 const row = tableBody.insertRow();
                 row.innerHTML = `
                     <td>${attendance.eventDetailID}</td>
@@ -56,30 +68,40 @@
             });
         }
 
+        // Function to add a new attendance record
         function addAttendance() {
             const form = document.getElementById('addAttendanceForm');
-            const newAttendance = {
-                eventDetailID: Math.max(...attendances.map(a => a.eventDetailID)) + 1,
-                patronID: parseInt(form.patronID.value),
-                eventID: parseInt(form.eventID.value)
-            };
-            attendances.push(newAttendance);
-            populateTable();
-            form.reset();
+            fetch('http://read-renaissance.com/api/attendances', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    patronID: parseInt(form.patronID.value),
+                    eventID: parseInt(form.eventID.value) // Ensure correct parameter name as per API specification
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data); // Debug response
+                fetchAttendances(); // Refresh the attendance list after adding
+            })
+            .catch(error => console.error('Error adding attendance:', error));
+            form.reset(); // Reset form fields after submission
         }
 
+        // Function to delete an attendance record
         function deleteAttendance(eventDetailID) {
-            const index = attendances.findIndex(a => a.eventDetailID.toString() === eventDetailID.toString());
-            if (index > -1) {
-                attendances.splice(index, 1);
-                populateTable();
-            } else {
-                console.log("Attendance with Event Detail ID:", eventDetailID, "not found.");
-            }
+            fetch(`http://read-renaissance.com/api/attendances/${eventDetailID}`, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data); // Debug response
+                fetchAttendances(); // Refresh the attendance list after deletion
+            })
+            .catch(error => console.error('Error deleting attendance:', error));
         }
-
-
-        window.onload = populateTable;
     </script>
 </body>
 </html>

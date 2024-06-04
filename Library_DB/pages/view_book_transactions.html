@@ -4,10 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>View Book Transactions</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
+    <!-- Main title for the transactions page -->
     <h1>View Book Transactions</h1>
+
+    <!-- Table for displaying transaction data -->
     <table id="transactionsTable">
         <thead>
             <tr>
@@ -16,54 +19,65 @@
                 <th>Number of Books</th>
                 <th>Staff ID</th>
                 <th>Date</th>
-                <th>Actions</th>
+                <th>Actions</th> <!-- Actions like Edit/Delete -->
             </tr>
         </thead>
         <tbody>
-            <!-- Dynamic transaction rows will be inserted here -->
+            <!-- Dynamic transaction rows will be inserted here via JavaScript -->
         </tbody>
     </table>
+
+    <!-- Section to add a new transaction -->
     <h2>Add New Transaction</h2>
     <form id="addTransactionForm">
         <label for="patronID">Patron ID:</label><br>
         <input type="number" id="patronID" name="patronID" required><br>
+
         <label for="numberBooks">Number of Books:</label><br>
         <input type="number" id="numberBooks" name="numberBooks" required><br>
+
         <label for="staffID">Staff ID:</label><br>
-        <input type="number" id="staffID" name="staffID" required><br>
+        <select id="staffID" name="staffID" required></select><br> <!-- Dropdown populated by fetchStaffIDs() -->
+
         <label for="date">Date:</label><br>
         <input type="date" id="date" name="date" required><br>
+
         <button type="button" onclick="addTransaction()">Submit</button>
     </form>
 
-
-<!-- Sample Data -->
     <script>
-        const transactions = [
-            {
-                transactionID: 1001,
-                patronID: 501,
-                numberOfBooks: 3,
-                staffID: 102,
-                date: '2024-04-15'
-            },
-            {
-                transactionID: 1002,
-                patronID: 502,
-                numberOfBooks: 1,
-                staffID: 103,
-                date: '2024-04-16'
-            },
-            {
-                transactionID: 1003,
-                patronID: 503,
-                numberOfBooks: 5,
-                staffID: 104,
-                date: '2024-04-17'
-            }
-        ];
+        // Fetch transactions and staff IDs on page load
+        document.addEventListener("DOMContentLoaded", function() {
+            fetchTransactions();
+            fetchStaffIDs();
+        });
 
-        function populateTable() {
+        // Fetch and populate staff ID dropdown
+        function fetchStaffIDs() {
+            fetch('http://read-renaissance.com/api/staff')
+                .then(response => response.json())
+                .then(staffMembers => {
+                    const select = document.getElementById('staffID');
+                    staffMembers.forEach(staff => {
+                        let option = document.createElement('option');
+                        option.value = staff.staffID;
+                        option.text = staff.firstName + ' ' + staff.lastName; // Display names for better UX
+                        select.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error fetching staff IDs:', error));
+        }
+
+        // Fetch and display transactions
+        function fetchTransactions() {
+            fetch('http://read-renaissance.com/api/transactions')
+                .then(response => response.json())
+                .then(transactions => populateTable(transactions))
+                .catch(error => console.error('Error fetching transactions:', error));
+        }
+
+        // Populate table with transaction data
+        function populateTable(transactions) {
             const tableBody = document.getElementById('transactionsTable').getElementsByTagName('tbody')[0];
             tableBody.innerHTML = '';
             transactions.forEach(transaction => {
@@ -71,7 +85,7 @@
                 row.innerHTML = `
                     <td>${transaction.transactionID}</td>
                     <td>${transaction.patronID}</td>
-                    <td>${transaction.numberOfBooks}</td>
+                    <td>${transaction.numberBooks}</td>
                     <td>${transaction.staffID}</td>
                     <td>${transaction.date}</td>
                     <td>
@@ -82,33 +96,42 @@
             });
         }
 
+        // Add a new transaction
         function addTransaction() {
             const form = document.getElementById('addTransactionForm');
-            const newTransaction = {
-                transactionID: transactions.length + 1001,
-                patronID: parseInt(form.patronID.value),
-                numberOfBooks: parseInt(form.numberBooks.value),
-                staffID: parseInt(form.staffID.value),
+            const formData = {
+                patronID: parseInt(form.patronID.value, 10),
+                numberBooks: parseInt(form.numberBooks.value, 10),
+                staffID: parseInt(form.staffID.value, 10),
                 date: form.date.value
             };
-            transactions.push(newTransaction);
-            populateTable();
-            form.reset();
+
+            fetch('http://read-renaissance.com/api/transactions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Server response:", data);
+                fetchTransactions(); // Refresh the transaction list
+            })
+            .catch(error => console.error('Error adding transaction:', error));
+            form.reset(); // Reset form after submission
         }
 
-    function deleteTransaction(transactionID) {
-        const index = transactions.findIndex(t => t.transactionID.toString() === transactionID.toString());
-        if (index > -1) {
-            transactions.splice(index, 1);
-            populateTable();
-            console.log("Transaction with ID:", transactionID, "has been deleted.");
-        } else {
-            console.log("Transaction with ID:", transactionID, "not found.");
+        // Delete a transaction
+        function deleteTransaction(transactionID) {
+            fetch(`http://read-renaissance.com/api/transactions/${transactionID}`, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message); // Notify user of the deletion
+                fetchTransactions(); // Refresh the transaction list
+            })
+            .catch(error => console.error('Error deleting transaction:', error));
         }
-    }
-
-
-        window.onload = populateTable;
     </script>
 </body>
 </html>
