@@ -7,8 +7,19 @@
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <!-- Main title for the page -->
-    <h1>Browse Books</h1>
+    <!-- Header with navigation -->
+    <header>
+        <h1>Books</h1>
+        <nav>
+            <a href="../index.html">Home</a>
+            <a href="browse_books.html">Books</a>
+            <a href="view_book_transactions.html">Book Transactions</a>
+            <a href="browse_patrons.html">Patrons</a>
+            <a href="view_patron_events.html">Patron Events</a>
+            <a href="view_patron_attendance.html">Patrons Attendance</a>
+            <a href="view_staff.html">Staff</a>
+        </nav>
+    </header>
 
     <!-- Table for displaying book data -->
     <table id="booksTable">
@@ -30,100 +41,103 @@
     <!-- Section to add a new book -->
     <h2>Add New Book</h2>
     <form id="addBookForm">
-        <label for="title">Title:</label><br>
-        <input type="text" id="title" name="title" required><br>
+        <fieldset>
+            <legend>Add New Book</legend>
+            <label for="title">Title:</label><br>
+            <input type="text" id="title" name="title" required><br>
 
-        <label for="author">Author:</label><br>
-        <input type="text" id="author" name="author"><br>
+            <label for="author">Author:</label><br>
+            <input type="text" id="author" name="author"><br>
 
-        <label for="isbn">ISBN:</label><br>
-        <input type="text" id="isbn" name="isbn" required><br>
+            <label for="isbn">ISBN:</label><br>
+            <input type="text" id="isbn" name="isbn" required><br>
 
-        <label for="publishedYear">Published Year:</label><br>
-        <input type="number" id="publishedYear" name="publishedYear" required><br>
+            <label for="publishedYear">Published Year:</label><br>
+            <input type="number" id="publishedYear" name="publishedYear" required><br>
 
-        <label for="genre">Genre:</label><br>
-        <input type="text" id="genre" name="genre"><br><br>
+            <label for="genre">Genre:</label><br>
+            <input type="text" id="genre" name="genre"><br><br>
 
-        <button type="button" onclick="addBook()">Submit</button>
+            <button type="button" onclick="addBook()">Submit</button>
+        </fieldset>
     </form>
 
-<script>
-    // Fetch books on page load
-    document.addEventListener("DOMContentLoaded", function() {
-        fetchBooks();
-    });
-
-    // Fetch books from the API
-    function fetchBooks() {
-        fetch('http://read-renaissance.com/api/books')  // Replace 'localhost:3000' with your domain name
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(books => populateTable(books))
-            .catch(error => console.error('Error fetching books:', error));
-    }
-
-    // Populate table with books data
-    function populateTable(books) {
-        const tableBody = document.getElementById('booksTable').getElementsByTagName('tbody')[0];
-        tableBody.innerHTML = '';
-        books.forEach(book => {
-            const row = tableBody.insertRow();
-            row.innerHTML = `
-                <td>${book.title}</td>
-                <td>${book.author}</td>
-                <td>${book.isbn}</td>
-                <td>${book.publishedYear}</td>
-                <td>${book.genre}</td>
-                <td>
-                    <button onclick="window.location.href='edit_pages/edit_book.html?isbn=${book.isbn}'">Edit</button>
-                    <button onclick="deleteBook('${book.isbn}')">Delete</button>
-                </td>
-            `;
+    <script>
+        // Fetch books on page load
+        document.addEventListener("DOMContentLoaded", function() {
+            fetchBooks();
         });
-    }
 
-    // Add a new book via the API
-    function addBook() {
-        const form = document.getElementById('addBookForm');
-        const formData = {
-            title: form.title.value,
-            author: form.author.value,
-            isbn: form.isbn.value,
-            publishedYear: form.publishedYear.value,
-            genre: form.genre.value
-        };
-        fetch('http://read-renaissance.com/api/books', {  // Replace 'localhost:3000' with your domain name
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(formData)
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log(data);
-            fetchBooks(); // Refresh the book list after adding
-        })
-        .catch(error => console.error('Error adding book:', error));
-        form.reset(); // Reset form after submission
-    }
+        // Fetch books from the API
+        function fetchBooks() {
+            fetch('http://read-renaissance.com/api/books')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(books => populateTable(books))
+                .catch(error => console.error('Error fetching books:', error));
+        }
 
-    // Delete a book from the API
-    function deleteBook(isbn) {
-        fetch(`http://read-renaissance.com/api/books/${isbn}`, {  // Replace 'localhost:3000' with your domain name
-            method: 'DELETE'
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log(data);
-            fetchBooks(); // Refresh the book list after deletion
-        })
-        .catch(error => console.error('Error deleting book:', error));
-    }
-</script>
+        // Populate table with books data
+        function populateTable(books) {
+            const tableBody = document.getElementById('booksTable').getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = '';
+            books.forEach(book => {
+                const row = tableBody.insertRow();
+                row.innerHTML = `
+                    <td>${book.title}</td>
+                    <td>${book.author}</td>
+                    <td>${book.isbn}</td>
+                    <td>${book.publishedYear}</td>
+                    <td>${book.genre}</td>
+                    <td>
+                        <button onclick="window.location.href='edit_pages/edit_book.html?isbn=${book.isbn}'">Edit</button>
+                        <button onclick="deleteBook('${book.isbn}')">Delete</button>
+                    </td>
+                `;
+            });
+        }
+
+        // Add a new book via the API
+        function addBook() {
+            const form = document.getElementById('addBookForm');
+            const formData = {
+                title: form.title.value,
+                author: form.author.value,
+                isbn: form.isbn.value,
+                publishedYear: form.publishedYear.value,
+                genre: form.genre.value
+            };
+            fetch('http://read-renaissance.com/api/books', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                fetchBooks(); // Refresh the book list after adding
+            })
+            .catch(error => console.error('Error adding book:', error));
+            form.reset(); // Reset form after submission
+        }
+
+        // Delete a book from the API
+        function deleteBook(isbn) {
+            fetch(`http://read-renaissance.com/api/books/${isbn}`, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                fetchBooks(); // Refresh the book list after deletion
+            })
+            .catch(error => console.error('Error deleting book:', error));
+        }
+    </script>
 
 </body>
 </html>

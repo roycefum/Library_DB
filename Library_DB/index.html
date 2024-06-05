@@ -4,11 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Library Management System</title>
-    <link rel="stylesheet" href="./pages/css/styles.css">
+    <link rel="stylesheet" href="pages/css/styles.css">
 </head>
 <body>
-    <h1>Library Management System</h1>
-    <h2>Index Page</h2>
+    <!-- Header with navigation -->
+    <header>
+        <h1>Library Management System</h1>
+        <h2>Library Home</h2>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="pages/browse_books.html">Books</a>
+            <a href="pages/view_book_transactions.html">Book Transactions</a>
+            <a href="pages/browse_patrons.html">Patrons</a>
+            <a href="pages/view_patron_events.html">Patron Events</a>
+            <a href="pages/view_patron_attendance.html">Patrons Attendance</a>
+            <a href="pages/view_staff.html">Staff</a>
+        </nav>
+    </header>
 
     <!-- Search Form -->
     <div id="search-form">
@@ -31,18 +43,7 @@
 
             // Placeholder for where you would add the logic to perform an actual search
             alert('Search for: ' + query + ' in category: ' + category);
-
-
         }
     </script>
-
-    <ul>
-        <li><a href="./pages/browse_books.html">Browse Books</a></li>
-        <li><a href="./pages/browse_patrons.html">Browse Patrons</a></li>
-        <li><a href="./pages/view_book_transactions.html">View Book Transactions</a></li>
-        <li><a href="./pages/view_patron_attendance.html">View Patron Attendance</a></li>
-        <li><a href="./pages/view_patron_events.html">View Patron Events</a></li>
-        <li><a href="./pages/view_staff.html">View Staff</a></li>
-    </ul>
 </body>
 </html>

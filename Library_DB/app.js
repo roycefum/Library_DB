@@ -4,11 +4,12 @@ const cors = require('cors');
 const db = require('./database/db-connector');
 
 const app = express();
-const PORT = 3000;
+const PORT = 3000; // Common practice to use a standard local port like 3000
 
 // Middleware to enable CORS and JSON body parsing
 app.use(cors());
 app.use(express.json());
+app.use(express.static('public'));
 
 // Helper function to execute database queries with promise support
 const executeQuery = async (query, params = []) => {

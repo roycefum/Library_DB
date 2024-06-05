@@ -7,8 +7,19 @@
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <!-- Page title -->
-    <h1>View Staff Members</h1>
+    <!-- Header with navigation -->
+    <header>
+        <h1>View Staff Members</h1>
+        <nav>
+            <a href="../index.html">Home</a>
+            <a href="browse_books.html">Books</a>
+            <a href="view_book_transactions.html">Book Transactions</a>
+            <a href="browse_patrons.html">Patrons</a>
+            <a href="view_patron_events.html">Patron Events</a>
+            <a href="view_patron_attendance.html">Patrons Attendance</a>
+            <a href="view_staff.html">Staff</a>
+        </nav>
+    </header>
 
     <!-- Table to display staff member data -->
     <table id="staffTable">
@@ -26,49 +37,49 @@
         </tbody>
     </table>
 
-<script>
-    // Fetch and populate the table with staff data on page load
-    window.onload = function() {
-        populateTable();
-    };
+    <script>
+        // Fetch and populate the table with staff data on page load
+        window.onload = function() {
+            populateTable();
+        };
 
-    // Populate the table with staff data
-    function populateTable() {
-        fetch('http://read-renaissance.com/api/staff')
-        .then(response => response.json())
-        .then(data => {
-            const tableBody = document.getElementById('staffTable').getElementsByTagName('tbody')[0];
-            tableBody.innerHTML = ''; // Clear the table first
-            data.forEach(staff => {
-                const row = tableBody.insertRow();
-                row.innerHTML = `
-                    <td>${staff.staffId}</td>
-                    <td>${staff.firstName}</td>
-                    <td>${staff.lastName}</td>
-                    <td>${staff.position}</td>
-                    <td>
-                        <button onclick="window.location.href='edit_pages/edit_staff.html?staffId=${staff.staffId}'">Edit</button>
-                        <button onclick="deleteStaff('${staff.staffId}')">Delete</button>
-                    </td>
-                `;
-            });
-        })
-        .catch(error => console.error('Error loading staff data:', error));
-    }
+        // Populate the table with staff data
+        function populateTable() {
+            fetch('http://read-renaissance.com/api/staff')
+            .then(response => response.json())
+            .then(data => {
+                const tableBody = document.getElementById('staffTable').getElementsByTagName('tbody')[0];
+                tableBody.innerHTML = ''; // Clear the table first
+                data.forEach(staff => {
+                    const row = tableBody.insertRow();
+                    row.innerHTML = `
+                        <td>${staff.staffId}</td>
+                        <td>${staff.firstName}</td>
+                        <td>${staff.lastName}</td>
+                        <td>${staff.position}</td>
+                        <td>
+                            <button onclick="window.location.href='edit_pages/edit_staff.html?staffId=${staff.staffId}'">Edit</button>
+                            <button onclick="deleteStaff('${staff.staffId}')">Delete</button>
+                        </td>
+                    `;
+                });
+            })
+            .catch(error => console.error('Error loading staff data:', error));
+        }
 
-    // Function to delete a staff member
-    function deleteStaff(staffId) {
-        fetch(`http://read-renaissance.com/api/staff/${staffId}`, {
-            method: 'DELETE'
-        })
-        .then(response => response.json())
-        .then(result => {
-            console.log(result); // Log the result for debugging
-            populateTable(); // Refresh the table after deletion
-        })
-        .catch(error => console.error('Error deleting staff member:', error));
-    }
-</script>
+        // Function to delete a staff member
+        function deleteStaff(staffId) {
+            fetch(`http://read-renaissance.com/api/staff/${staffId}`, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(result => {
+                console.log(result);
+                populateTable(); // Refresh the table after deletion
+            })
+            .catch(error => console.error('Error deleting staff member:', error));
+        }
+    </script>
 
 </body>
 </html>

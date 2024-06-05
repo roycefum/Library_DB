@@ -7,8 +7,19 @@
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <!-- Page title -->
-    <h1>View Patron Events</h1>
+    <!-- Header with navigation -->
+    <header>
+        <h1>Patron Events</h1>
+        <nav>
+            <a href="../index.html">Home</a>
+            <a href="browse_books.html">Books</a>
+            <a href="view_book_transactions.html">Book Transactions</a>
+            <a href="browse_patrons.html">Patrons</a>
+            <a href="view_patron_events.html">Patron Events</a>
+            <a href="view_patron_attendance.html">Patrons Attendance</a>
+            <a href="view_staff.html">Staff</a>
+        </nav>
+    </header>
 
     <!-- Table to display events -->
     <table id="eventsTable">
@@ -31,91 +42,94 @@
     <!-- Form to add a new event -->
     <h2>Add New Event</h2>
     <form id="addEventForm">
-        <label for="eventName">Event Name:</label><br>
-        <input type="text" id="eventName" name="eventName" required><br>
-        <label for="event_Date">Event Date:</label><br>
-        <input type="datetime-local" id="event_Date" name="event_Date" required><br>
-        <label for="description">Description:</label><br>
-        <textarea id="description" name="description"></textarea><br>
-        <label for="attendance">Attendance:</label><br>
-        <input type="number" id="attendance" name="attendance"><br>
-        <label for="staffID">Staff ID:</label><br>
-        <input type="number" id="staffID" name="staffID" required><br>
-        <button type="button" onclick="addEvent()">Submit</button>
+        <fieldset>
+            <legend>Add New Event</legend>
+            <label for="eventName">Event Name:</label><br>
+            <input type="text" id="eventName" name="eventName" required><br>
+            <label for="eventDate">Event Date:</label><br>
+            <input type="datetime-local" id="eventDate" name="eventDate" required><br>
+            <label for="description">Description:</label><br>
+            <textarea id="description" name="description"></textarea><br>
+            <label for="attendance">Attendance:</label><br>
+            <input type="number" id="attendance" name="attendance"><br>
+            <label for="staffId">Staff ID:</label><br>
+            <input type="number" id="staffId" name="staffId" required><br>
+            <button type="button" onclick="addEvent()">Submit</button>
+        </fieldset>
     </form>
 
-<script>
-// Initialize event fetching on page load
-document.addEventListener("DOMContentLoaded", function() {
-    fetchEvents();
-});
+    <script>
+        // Initialize event fetching on page load
+        document.addEventListener("DOMContentLoaded", function() {
+            fetchEvents();
+        });
 
-// Fetch events from the server
-function fetchEvents() {
-    fetch('http://read-renaissance.com/api/events')
-        .then(response => response.json())
-        .then(data => populateTable(data))
-        .catch(error => console.error('Error fetching events:', error));
-}
+        // Fetch events from the server
+        function fetchEvents() {
+            fetch('http://read-renaissance.com/api/events')
+                .then(response => response.json())
+                .then(data => populateTable(data))
+                .catch(error => console.error('Error fetching events:', error));
+        }
 
-// Populate the table with event data
-function populateTable(events) {
-    const tableBody = document.getElementById('eventsTable').getElementsByTagName('tbody')[0];
-    tableBody.innerHTML = ''; // Clear existing entries
-    events.forEach(event => {
-        const row = tableBody.insertRow();
-        row.innerHTML = `
-            <td>${event.eventID}</td>
-            <td>${event.eventName}</td>
-            <td>${event.event_Date}</td>
-            <td>${event.description}</td>
-            <td>${event.attendance}</td>
-            <td>${event.staffID}</td>
-            <td>
-                <button onclick="window.location.href='edit_pages/edit_event.html?eventId=${event.eventID}'">Edit</button>
-                <button onclick="deleteEvent('${event.eventID}')">Delete</button>
-            </td>
-        `;
-    });
-}
+        // Populate the table with event data
+        function populateTable(events) {
+            const tableBody = document.getElementById('eventsTable').getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = ''; // Clear existing entries
+            events.forEach(event => {
+                const row = tableBody.insertRow();
+                row.innerHTML = `
+                    <td>${event.eventID}</td>
+                    <td>${event.eventName}</td>
+                    <td>${event.eventDate}</td>
+                    <td>${event.description}</td>
+                    <td>${event.attendance}</td>
+                    <td>${event.staffID}</td>
+                    <td>
+                        <button onclick="window.location.href='edit_pages/edit_event.html?eventId=${event.eventID}'">Edit</button>
+                        <button onclick="deleteEvent('${event.eventID}')">Delete</button>
+                    </td>
+                `;
+            });
+        }
 
-// Add a new event to the server
-function addEvent() {
-    const form = document.getElementById('addEventForm');
-    const eventData = {
-        eventName: form.eventName.value,
-        event_Date: form.event_Date.value,
-        description: form.description.value,
-        attendance: parseInt(form.attendance.value),
-        staffID: parseInt(form.staffID.value)
-    };
-    fetch('http://read-renaissance.com/api/events', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(eventData)
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log(data);
-        fetchEvents(); // Refresh the events list
-    })
-    .catch(error => console.error('Error adding event:', error));
-    form.reset(); // Reset form after submission
-}
+        // Add a new event to the server
+        function addEvent() {
+            const form = document.getElementById('addEventForm');
+            const eventData = {
+                eventName: form.eventName.value,
+                eventDate: form.eventDate.value,
+                description: form.description.value,
+                attendance: parseInt(form.attendance.value),
+                staffId: parseInt(form.staffId.value)
+            };
+            fetch('http://read-renaissance.com/api/events', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(eventData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                fetchEvents(); // Refresh the events list
+            })
+            .catch(error => console.error('Error adding event:', error));
+            form.reset(); // Reset form after submission
+        }
 
-// Delete an event from the server
-function deleteEvent(eventId) {
-    fetch(`http://read-renaissance.com/api/events/${eventId}`, {
-        method: 'DELETE'
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log(data);
-        fetchEvents(); // Refresh the events list
-    })
-    .catch(error => console.error('Error deleting event:', error));
-}
-</script>
+        // Delete an event from the server
+        function deleteEvent(eventId) {
+            fetch(`http://read-renaissance.com/api/events/${eventId}`, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                fetchEvents(); // Refresh the events list
+            })
+            .catch(error => console.error('Error deleting event:', error));
+        }
+    </script>
 
 </body>
 </html>

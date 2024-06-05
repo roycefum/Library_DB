@@ -7,8 +7,19 @@
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <!-- Main title for the transactions page -->
-    <h1>View Book Transactions</h1>
+    <!-- Header with navigation -->
+    <header>
+        <h1>Book Transactions</h1>
+        <nav>
+            <a href="../index.html">Home</a>
+            <a href="browse_books.html">Books</a>
+            <a href="view_book_transactions.html">Book Transactions</a>
+            <a href="browse_patrons.html">Patrons</a>
+            <a href="view_patron_events.html">Patron Events</a>
+            <a href="view_patron_attendance.html">Patrons Attendance</a>
+            <a href="view_staff.html">Staff</a>
+        </nav>
+    </header>
 
     <!-- Table for displaying transaction data -->
     <table id="transactionsTable">
@@ -30,19 +41,22 @@
     <!-- Section to add a new transaction -->
     <h2>Add New Transaction</h2>
     <form id="addTransactionForm">
-        <label for="patronID">Patron ID:</label><br>
-        <input type="number" id="patronID" name="patronID" required><br>
+        <fieldset>
+            <legend>Add New Transaction</legend>
+            <label for="patronID">Patron ID:</label><br>
+            <input type="number" id="patronID" name="patronID" required><br>
 
-        <label for="numberBooks">Number of Books:</label><br>
-        <input type="number" id="numberBooks" name="numberBooks" required><br>
+            <label for="numberBooks">Number of Books:</label><br>
+            <input type="number" id="numberBooks" name="numberBooks" required><br>
 
-        <label for="staffID">Staff ID:</label><br>
-        <select id="staffID" name="staffID" required></select><br> <!-- Dropdown populated by fetchStaffIDs() -->
+            <label for="staffID">Staff ID:</label><br>
+            <select id="staffID" name="staffID" required></select><br> <!-- Dropdown populated by fetchStaffIDs() -->
 
-        <label for="date">Date:</label><br>
-        <input type="date" id="date" name="date" required><br>
+            <label for="date">Date:</label><br>
+            <input type="date" id="date" name="date" required><br>
 
-        <button type="button" onclick="addTransaction()">Submit</button>
+            <button type="button" onclick="addTransaction()">Submit</button>
+        </fieldset>
     </form>
 
     <script>

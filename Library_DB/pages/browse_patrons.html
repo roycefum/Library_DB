@@ -7,8 +7,19 @@
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <!-- Main title for the patrons page -->
-    <h1>Browse Patrons</h1>
+    <!-- Header with navigation -->
+    <header>
+        <h1>Patrons</h1>
+        <nav>
+            <a href="../index.html">Home</a>
+            <a href="browse_books.html">Books</a>
+            <a href="view_book_transactions.html">Book Transactions</a>
+            <a href="browse_patrons.html">Patrons</a>
+            <a href="view_patron_events.html">Patron Events</a>
+            <a href="view_patron_attendance.html">Patrons Attendance</a>
+            <a href="view_staff.html">Staff</a>
+        </nav>
+    </header>
 
     <!-- Table for displaying patron data -->
     <table id="patronsTable">
@@ -30,19 +41,22 @@
     <!-- Section to add a new patron -->
     <h2>Add New Patron</h2>
     <form id="addPatronForm">
-        <label for="firstName">First Name:</label><br>
-        <input type="text" id="firstName" name="firstName" required><br>
+        <fieldset>
+            <legend>Add New Patron</legend>
+            <label for="firstName">First Name:</label><br>
+            <input type="text" id="firstName" name="firstName" required><br>
 
-        <label for="lastName">Last Name:</label><br>
-        <input type="text" id="lastName" name="lastName" required><br>
+            <label for="lastName">Last Name:</label><br>
+            <input type="text" id="lastName" name="lastName" required><br>
 
-        <label for="email">Email:</label><br>
-        <input type="email" id="email" name="email" required><br>
+            <label for="email">Email:</label><br>
+            <input type="email" id="email" name="email" required><br>
 
-        <label for="membershipDate">Membership Date:</label><br>
-        <input type="date" id="membershipDate" name="membershipDate" required><br>
+            <label for="membershipDate">Membership Date:</label><br>
+            <input type="date" id="membershipDate" name="membershipDate" required><br>
 
-        <button type="button" onclick="addPatron()">Submit</button>
+            <button type="button" onclick="addPatron()">Submit</button>
+        </fieldset>
     </form>
 
     <script>

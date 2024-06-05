@@ -7,8 +7,19 @@
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <!-- Title of the page -->
-    <h1>View Patron Events Attendance</h1>
+    <!-- Header with navigation -->
+    <header>
+        <h1>Patron Events Attendance</h1>
+        <nav>
+            <a href="../index.html">Home</a>
+            <a href="browse_books.html">Books</a>
+            <a href="view_book_transactions.html">Book Transactions</a>
+            <a href="browse_patrons.html">Patrons</a>
+            <a href="view_patron_events.html">Patron Events</a>
+            <a href="view_patron_attendance.html">Patrons Attendance</a>
+            <a href="view_staff.html">Staff</a>
+        </nav>
+    </header>
 
     <!-- Table to display events attendance -->
     <table id="attendanceTable">
@@ -28,11 +39,14 @@
     <!-- Form to add new attendance record -->
     <h2>Add New Attendance</h2>
     <form id="addAttendanceForm">
-        <label for="patronID">Patron ID:</label><br>
-        <input type="number" id="patronID" name="patronID" required><br>
-        <label for="eventID">Event ID:</label><br>
-        <input type="number" id="eventID" name="eventID" required><br>
-        <button type="button" onclick="addAttendance()">Submit</button>
+        <fieldset>
+            <legend>Add New Attendance</legend>
+            <label for="patronID">Patron ID:</label><br>
+            <input type="number" id="patronID" name="patronID" required><br>
+            <label for="eventID">Event ID:</label><br>
+            <input type="number" id="eventID" name="eventID" required><br>
+            <button type="button" onclick="addAttendance()">Submit</button>
+        </fieldset>
     </form>
 
     <script>
@@ -78,13 +92,13 @@
                 },
                 body: JSON.stringify({
                     patronID: parseInt(form.patronID.value),
-                    eventID: parseInt(form.eventID.value) // Ensure correct parameter name as per API specification
+                    eventID: parseInt(form.eventID.value)
                 })
             })
             .then(response => response.json())
             .then(data => {
-                console.log(data); // Debug response
-                fetchAttendances(); // Refresh the attendance list after adding
+                console.log(data);
+                fetchAttendances();
             })
             .catch(error => console.error('Error adding attendance:', error));
             form.reset(); // Reset form fields after submission

@@ -1,7 +1,47 @@
+@import url('https://fonts.googleapis.com/css2?family=Amarante&family=Averia+Serif+Libre:wght@400;700&display=swap');
+
+/*   ----- Variables  -----  */
+:root {
+    --veryDarkBlue: #152B38;
+    --mediumBlue: #4B89BFEF;
+    --veryLightBlue: #B8CAD9;
+    --darkTurquoise: #426664;
+    --darkSand: #DFCEB9;
+}
+
+/*  ----- Page layout blocks -----  */
+header {
+    background-color: var( --darkTurquoise);
+    border-radius: 25px;
+    margin-bottom: 25px;
+    color: var(--darkSand);
+    padding-top: 1px;
+    padding-bottom: 1px;
+    padding-left: 6px;
+    font-size: 18px;
+
+
+
+}
+
+nav {
+    font-family: 'Averia Serif Libre', serif;
+}
+
+legend{
+
+    font-size: 24px;
+}
+
+h1{
+    padding-bottom: 20px;
+    font-family: 'Amarante', serif;
+}
+
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Averia Serif Libre', serif;
     margin: 20px;
-    background-color: #121212;
+    background-color: var( --darkTurquoise);
     color: #e0e0e0;
 }
 
@@ -9,6 +49,7 @@ table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
+
 }
 
 th, td {
@@ -16,6 +57,7 @@ th, td {
     padding: 8px;
     text-align: left;
     background-color: #1e1e1e;
+
 }
 
 th {
@@ -36,3 +78,35 @@ button {
 button:hover {
     background-color: #535353;
 }
+
+nav {
+    padding-top: 8px;
+    padding-bottom: 8px;
+    flex-direction:row;
+    max-width: 100px;
+    display:table-row;
+
+}
+
+    nav a {
+        background-color: var(--veryLightBlue);
+        border-top-left-radius: 25px;
+        border-top-right-radius: 25px;
+        margin-left: 20px;
+        margin-inline: 2px;
+        color: var(--veryDarkBlue);
+        padding: 15px;
+        padding-bottom: 5px;
+        text-decoration: none;
+        border: 3px solid var(--darkTurquoise);
+        display: inline;
+        flex-flow: row wrap;
+
+
+    }
+
+        nav a:hover {
+            background-color: var(--veryDarkBlue);
+            color: var(--veryLightBlue);
+            border: 3px solid var(--veryLightBlue);
+        }
