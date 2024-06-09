@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Book Transactions</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Header with navigation -->
+    <header>
+        <h1>Book Checkout</h1>
+        <nav>
+            <a href="../index.html">Home</a>
+            <a href="browse_books.html">Books</a>
+            <a href="view_book_transactions.html">Book Transactions</a>
+            <a href="transaction_details.html">Checkout Details</a>
+            <a href="book_checkout.html">Book Checkout</a>
+            <a href="browse_patrons.html">Patrons</a>
+            <a href="view_patron_events.html">Patron Events</a>
+            <a href="view_patron_attendance.html">Patrons Attendance</a>
+            <a href="view_staff.html">Staff</a>
+        </nav>
+    </header>
+
+    <!-- Table for displaying transaction data -->
+    <table id="transactionsTable">
+        <thead>
+            <tr>
+                <th>Transaction Detail ID</th>
+                <th>Transaction ID</th>
+                <th>Patron ID</th>                
+                <th>Book ID</th>
+                <th>Staff ID</th>
+                <th>Title</th>
+                <th>Date</th>
+                <th>Due Date</th>
+                <th>Actions</th> <!-- Actions like Edit/Delete -->
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Dynamic transaction rows will be inserted here via JavaScript -->
+        </tbody>
+    </table>
+    <h3 id = "addtrans" >
+        <button type = "button"> Checkout</button>
+    </h3>
+    <form id = "searchBook">
+        <fieldset>
+            <legend> Search Book</legend>
+            <label for="title">Title:</label><br>
+            <input type="text" id="title" name="title" required><br>
+
+            <label for="isbn">ISBN:</label><br>
+            <input type="text" id="isbn" name="isbn" required><br>
+
+            <label for="bookID">BookID:</label><br>
+            <input type="text" id="bookID" name="bookID" required><br>
+
+            <label for="author">Author:</label><br>
+            <input type="text" id="author" name="author"><br>
+
+            <button type="button" onclick="addBook()">Search</button>
+
+            <h2> Search Results</h2>
+            <table id="bookSearchResultsTable">
+                <thead>
+                    <tr>
+                        <th>BookID</th>         
+                        <th>Title</th>
+                        <th>ISBN</th>                       
+                        <th>Actions</th> <!-- Actions like ADD to checkout list -->
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Dynamic search result rows will be inserted here via JavaScript -->
+                </tbody>
+            </table>
+
+            <h3 id = "addtocart">
+                <button type = "button"> Add to cart</button>
+            </h3>
+            
+        </fieldset>
+    </form>
+          
+    

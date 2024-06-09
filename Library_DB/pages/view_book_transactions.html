@@ -14,6 +14,8 @@
             <a href="../index.html">Home</a>
             <a href="browse_books.html">Books</a>
             <a href="view_book_transactions.html">Book Transactions</a>
+            <a href="transaction_details.html">Checkout Details</a>
+            <a href="book_checkout.html">Book Checkout</a>
             <a href="browse_patrons.html">Patrons</a>
             <a href="view_patron_events.html">Patron Events</a>
             <a href="view_patron_attendance.html">Patrons Attendance</a>
@@ -38,27 +40,61 @@
         </tbody>
     </table>
 
+    <!-- Filter section -->
+    <h2>Filter Results by</h2>
+    <div class="filter-container">
+        <select id="filterCriteria">
+            <option value="transactionID">Transaction ID</option>
+            <option value="patronID">Patron ID</option>
+            <option value="staffID">Staff ID</option>
+        </select>
+        <input type="text" id="filterInput" onkeyup="filterTable()" placeholder="Enter filter value...">
+    </div>
+
     <!-- Section to add a new transaction -->
-    <h2>Add New Transaction</h2>
-    <form id="addTransactionForm">
-        <fieldset>
-            <legend>Add New Transaction</legend>
-            <label for="patronID">Patron ID:</label><br>
-            <input type="number" id="patronID" name="patronID" required><br>
+    <div class = "row">
+        <div class = "column">
+            <form id="addTransactionForm">
+                <fieldset>
+                    <legend>Add New Transaction</legend>
+                    <label for="patronID">Patron ID:</label><br>
+                    <input type="number" id="patronID" name="patronID" required><br>
 
-            <label for="numberBooks">Number of Books:</label><br>
-            <input type="number" id="numberBooks" name="numberBooks" required><br>
+                    <label for="numberBooks">Number of Books:</label><br>
+                    <input type="number" id="numberBooks" name="numberBooks" required><br>
 
-            <label for="staffID">Staff ID:</label><br>
-            <select id="staffID" name="staffID" required></select><br> <!-- Dropdown populated by fetchStaffIDs() -->
+                    <label for="staffID">Staff ID:</label><br>
+                    <select id="staffID" name="staffID" required></select><br> <!-- Dropdown populated by fetchStaffIDs() -->
 
-            <label for="date">Date:</label><br>
-            <input type="date" id="date" name="date" required><br>
+                    <label for="date">Date:</label><br>
+                    <input type="date" id="date" name="date" required><br>
 
-            <button type="button" onclick="addTransaction()">Submit</button>
-        </fieldset>
-    </form>
+                    <button type="button" onclick="addTransaction()">Submit</button>
+                </fieldset>
+            </form>
+        </div>
+        <div class = "column">
+            
+            <form id="editTransactionForm">
+                <fieldset>
+                <legend>Edit Book Transaction</legend>
+                <label for="patronID">Patron ID:</label><br>
+                <input type="number" id="patronID" name="patronID" required><br>
 
+                <label for="numberBooks">Number of Books:</label><br>
+                <input type="number" id="numberBooks" name="numberBooks" required><br>
+
+                <label for="staffID">Staff ID:</label><br>
+                <input type="number" id="staffID" name="staffID" required><br>
+
+                <label for="date">Date:</label><br>
+                <input type="date" id="date" name="date" required><br>
+                
+                <button type="button" onclick="updateTransaction()">Update</button>
+                </fieldset>
+            </form>
+        </div>    
+    </div>
     <script>
         // Fetch transactions and staff IDs on page load
         document.addEventListener("DOMContentLoaded", function() {
@@ -146,6 +182,31 @@
             })
             .catch(error => console.error('Error deleting transaction:', error));
         }
+
+        // Filter table based on selected criteria and input value
+        function filterTable() {
+            const filterCriteria = document.getElementById('filterCriteria').value;
+            const filterValue = document.getElementById('filterInput').value.toUpperCase();
+            const table = document.getElementById('transactionsTable');
+            const tbody = table.getElementsByTagName('tbody')[0];
+            const rows = tbody.getElementsByTagName('tr');
+
+            for (let i = 0; i < rows.length; i++) {
+                const cell = rows[i].getElementsByTagName('td')[{
+                    transactionID: 0,
+                    patronID: 1,
+                    staffID: 3
+                }[filterCriteria]];
+                if (cell) {
+            const cellValue = cell.innerText.trim().toUpperCase();
+            if (filterValue === cellValue) { // Exact matching
+                rows[i].style.display = '';
+            } else {
+                rows[i].style.display = 'none';
+            }
+        }
+    }
+}
     </script>
 </body>
 </html>

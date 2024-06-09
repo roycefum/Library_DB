@@ -14,6 +14,8 @@
             <a href="../index.html">Home</a>
             <a href="browse_books.html">Books</a>
             <a href="view_book_transactions.html">Book Transactions</a>
+            <a href="transaction_details.html">Checkout Details</a>
+            <a href="book_checkout.html">Book Checkout</a>
             <a href="browse_patrons.html">Patrons</a>
             <a href="view_patron_events.html">Patron Events</a>
             <a href="view_patron_attendance.html">Patrons Attendance</a>
@@ -38,8 +40,20 @@
         </tbody>
     </table>
 
+     <!-- Filter section -->
+    <h2>Filter by</h2>
+    <div class="filter-container">
+        <select id="filterCriteria">
+            <option value="patronID">Patron ID</option>
+            <option value="firstName">First Name</option>
+            <option value="lastName">Last Name</option>
+            <option value="email">Email</option>
+        </select>
+        <input type="text" id="filterInput" onkeyup="filterTable()" placeholder="Search for patrons...">
+    </div>
+
     <!-- Section to add a new patron -->
-    <h2>Add New Patron</h2>
+    
     <form id="addPatronForm">
         <fieldset>
             <legend>Add New Patron</legend>
@@ -139,6 +153,38 @@
                 fetchPatrons(); // Refresh the patron list
             })
             .catch(error => console.error('Error deleting patron:', error));
+        }
+
+        // Filter table based on search input and selected criteria
+        function filterTable() {
+            const filterCriteria = document.getElementById('filterCriteria').value;
+            const filterValue = document.getElementById('filterInput').value.trim().toUpperCase();
+            const table = document.getElementById('patronsTable');
+            const tbody = table.getElementsByTagName('tbody')[0];
+            const rows = tbody.getElementsByTagName('tr');
+
+            for (let i = 0; i < rows.length; i++) {
+                const cells = rows[i].getElementsByTagName('td');
+                let match = false;
+                if (filterCriteria === 'patronID' && cells[0]) {
+                    if (cells[0].innerText.trim().toUpperCase() === filterValue) {
+                        match = true;
+                    }
+                } else if (filterCriteria === 'firstName' && cells[1]) {
+                    if (cells[1].innerText.trim().toUpperCase() === filterValue) {
+                        match = true;
+                    }
+                } else if (filterCriteria === 'lastName' && cells[2]) {
+                    if (cells[2].innerText.trim().toUpperCase() === filterValue) {
+                        match = true;
+                    }
+                } else if (filterCriteria === 'email' && cells[3]) {
+                    if (cells[3].innerText.trim().toUpperCase() === filterValue) {
+                        match = true;
+                    }
+                }
+                rows[i].style.display = match ? '' : 'none';
+            }
         }
     </script>
 

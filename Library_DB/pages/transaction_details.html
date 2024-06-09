@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Book Transactions</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Header with navigation -->
+    <header>
+        <h1>Checkout Details</h1>
+        <nav>
+            <a href="../index.html">Home</a>
+            <a href="browse_books.html">Books</a>
+            <a href="view_book_transactions.html">Book Transactions</a>
+            <a href="transaction_details.html">Checkout Details</a>
+            <a href="book_checkout.html">Book Checkout</a>
+            <a href="browse_patrons.html">Patrons</a>
+            <a href="view_patron_events.html">Patron Events</a>
+            <a href="view_patron_attendance.html">Patrons Attendance</a>
+            <a href="view_staff.html">Staff</a>
+        </nav>
+    </header>
+
+    <!-- Table for displaying transaction data -->
+    <table id="transactionsTable">
+        <thead>
+            <tr>
+                <th>Transaction Detail ID</th>
+                <th>Transaction ID</th>
+                <th>Patron ID</th>                
+                <th>Book ID</th>
+                <th>Staff ID</th>
+                <th>Title</th>
+                <th>Date</th>
+                <th>Due Date</th>
+                <th>Actions</th> <!-- Actions like Edit/Delete -->
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Dynamic transaction rows will be inserted here via JavaScript -->
+        </tbody>
+    </table>
+  
+    
+            <!-- Filter section -->
+            
+        <fieldset>
+            <legend> Lookup Checkout Details</legend>
+            <div class="filter-container">
+                <select id="filterCriteria">
+                    <option value="0">Transaction Detail ID</option>
+                    <option value="1">Transaction ID</option>
+                    <option value="2">Patron ID</option>
+                    <option value="3">Book ID</option>
+                    <option value="4">Staff ID</option>
+                    <option value="5">Title</option>
+                    <option value="6">Date</option>
+                    <option value="7">Due Date</option>
+                </select>
+                <input type="text" id="filterInput" onkeyup="filterTable()" placeholder="Search for transactions...">
+            </div>
+            
+        </fieldset>
+    </form>
+
+    <script>
+        // Filter table based on search input and selected criteria
+        function filterTable() {
+            const filterCriteria = document.getElementById('filterCriteria').value;
+            const filterValue = document.getElementById('filterInput').value.trim().toUpperCase();
+            const table = document.getElementById('transactionsTable');
+            const tbody = table.getElementsByTagName('tbody')[0];
+            const rows = tbody.getElementsByTagName('tr');
+
+            for (let i = 0; i < rows.length; i++) {
+                const cells = rows[i].getElementsByTagName('td');
+                let match = false;
+                if (cells[filterCriteria]) {
+                    if (cells[filterCriteria].innerText.trim().toUpperCase() === filterValue) {
+                        match = true;
+                    }
+                }
+                rows[i].style.display = match ? '' : 'none';
+            }
+        }
+    </script>
+          
+    
