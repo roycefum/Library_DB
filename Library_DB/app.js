@@ -7,7 +7,8 @@
 // SETUP
 const express = require('express');
 const cors = require('cors');
-const db = require('./database/db-connector');
+const db = require('./api/helpers/database/db-connector');
+const path = require('path');
 
 // Define Routes
 const booksRoutes = require('./api/routes/books');
@@ -25,6 +26,7 @@ const PORT = 3000;
 // Middleware to enable CORS and JSON body parsing
 app.use(cors());
 app.use(express.json());
+app.use(express.static(path.join(__dirname)));
 
 // API Endpoints
 app.use('/api/books', booksRoutes);
