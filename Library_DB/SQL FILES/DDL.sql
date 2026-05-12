@@ -43,7 +43,7 @@ CREATE TABLE Books (
     title varchar(255) NOT NULL,
     author varchar(255),
     isbn varchar(255) UNIQUE,
-    publishedYear year,
+    publishedYear int,
     genre varchar(255),
     PRIMARY KEY (bookID)
 );
@@ -65,8 +65,8 @@ CREATE TABLE Book_Transaction_Details (
     transactionDetailsID int NOT NULL AUTO_INCREMENT,
     transactionID int,
     bookID int,
-    date date,
     dueDate date,
+    returnDate date,
     PRIMARY KEY (transactionDetailsID),
     FOREIGN KEY (transactionID) REFERENCES Book_Transactions(transactionID) ON DELETE CASCADE,
     FOREIGN KEY (bookID) REFERENCES Books(bookID)
@@ -102,10 +102,10 @@ INSERT INTO Patrons (first_name, last_name, membershipDate, email, address, phon
 ('Kathryn','Janeway','2000-06-18','lostindelta@yahoo.com','100367 Long Rd', '555-888-9276');
 
 INSERT INTO Books (title, author, isbn, publishedYear, genre) VALUES
-('1984','George Orwell','1234567890123','1946', 'fiction'),
-('To Kill a Mockingbird', 'Harper Lee', '2234567890223', '1971', 'courtroom'),
-('Robinson Crusoe', 'Daniel Defoe', '3234567890323', '1875', 'survival'),
-('The Color Purple','Alice Walker', '4234567890423', '1966', 'drama');
+('1984','George Orwell','1234567890123',1946, 'fiction'),
+('To Kill a Mockingbird', 'Harper Lee', '2234567890223', 1971, 'courtroom'),
+('Robinson Crusoe', 'Daniel Defoe', '3234567890323', 1875, 'survival'),
+('The Color Purple','Alice Walker', '4234567890423', 1966, 'drama');
 
 INSERT INTO Book_Transactions (patronID, numberBooks, staffID, date) VALUES
 (3,2,1,'2024-04-27'),
@@ -119,11 +119,11 @@ INSERT INTO Staff (first_name, last_name, position) VALUES
 ('Kira','Nerice','Special Collections'),
 ('Tom','Paris','Social Media');
 
-INSERT INTO Book_Transaction_Details (transactionID, bookID, date, dueDate) VALUES
-(1,3, '2024-04-27', '2024-05-27'),
-(2,3,'2024-04-27','2024-05-01'),
-(3,3,'2024-04-27','2024-06-29'),
-(4,1,'2024-04-28','2024-05-30');
+INSERT INTO Book_Transaction_Details (transactionID, bookID, dueDate) VALUES
+(1,3,'2024-05-27'),
+(2,3,'2024-05-01'),
+(3,3,'2024-06-29'),
+(4,1,'2024-05-30');
 
 INSERT INTO Patron_Events(eventName, event_Date, description, attendance, staffID) VALUES
 ('welcome brunch','2024-04-03','eggs and bacon',3,1),
