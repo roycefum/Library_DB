@@ -78,7 +78,6 @@ CREATE TABLE Patron_Events (
     eventName varchar(255) NOT NULL,
     event_Date datetime NOT NULL,
     description text,
-    attendance int,
     staffID int NOT NULL,
     PRIMARY KEY (eventID),
     FOREIGN KEY (staffID) REFERENCES Staff(staffID)
@@ -125,11 +124,11 @@ INSERT INTO Book_Transaction_Details (transactionID, bookID, dueDate) VALUES
 (3,3,'2024-06-29'),
 (4,1,'2024-05-30');
 
-INSERT INTO Patron_Events(eventName, event_Date, description, attendance, staffID) VALUES
-('welcome brunch','2024-04-03','eggs and bacon',3,1),
-('dinner party', '2024-05-01','large buffet',4,1),
-('silent auction','2024-06-04','big fundraiser',2,2),
-('bingo night', '2023-11-18','great for older patrons', 4, 3);
+INSERT INTO Patron_Events(eventName, event_Date, description, staffID) VALUES
+('welcome brunch','2024-04-03','eggs and bacon',1),
+('dinner party', '2024-05-01','large buffet',1),
+('silent auction','2024-06-04','big fundraiser',2),
+('bingo night', '2023-11-18','great for older patrons',3);
 
 INSERT INTO Patron_Events_Attendance (eventID, patronID) VALUES
 (1,1),
