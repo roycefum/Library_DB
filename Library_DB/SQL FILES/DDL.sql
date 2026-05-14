@@ -138,3 +138,21 @@ INSERT INTO Patron_Events_Attendance (eventID, patronID) VALUES
 (2,3),
 (2,2),
 (2,1);
+
+-- View for Books with Availability Status
+CREATE VIEW Books_With_Availability AS
+SELECT 
+    b.bookID,
+    b.title,
+    b.author,
+    b.isbn,
+    b.publishedYear,
+    b.genre,
+    CASE 
+        WHEN COUNT(btd.transactionDetailsID) = 0 THEN 'Available'
+        WHEN SUM(CASE WHEN btd.returnDate IS NULL THEN 1 ELSE 0 END) > 0 THEN 'Checked Out'
+        ELSE 'Available'
+    END AS status
+FROM Books b
+LEFT JOIN Book_Transaction_Details btd ON b.bookID = btd.bookID
+GROUP BY b.bookID;
