@@ -13,7 +13,7 @@ const executeQuery = async (query, params = []) => {
 
 exports.getAllBooks = async (req, res) => {
     try {
-        const results = await executeQuery('SELECT * FROM Books');
+        const results = await executeQuery('SELECT * FROM Books_With_Availability');
         res.json(results);
     } catch (err) {
         res.status(500).json({ error: err.message });

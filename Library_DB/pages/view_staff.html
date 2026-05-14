@@ -86,7 +86,7 @@
 
         // Fetches staff data from the server
         function fetchStaff() {
-            fetch('http://read-renaissance.com/api/staff')
+            fetch('${API_BASE_URL}/api/staff')
                 .then(response => response.json())
                 .then(data => {
                     populateTable(data); // Populate table with fetched data
@@ -126,7 +126,7 @@
                 return;
             }
 
-            fetch('http://read-renaissance.com/api/staff', {
+            fetch('${API_BASE_URL}/api/staff', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ firstName, lastName, position })
@@ -153,7 +153,7 @@
                 return;
             }
 
-            fetch(`http://read-renaissance.com/api/staff/${staffId}`, {
+            fetch(`${API_BASE_URL}/api/staff/${staffId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ firstName, lastName, position })
@@ -183,7 +183,7 @@
                 return;
             }
 
-            fetch(`http://read-renaissance.com/api/staff/${staffId}`, {
+            fetch(`${API_BASE_URL}/api/staff/${staffId}`, {
                 method: 'DELETE'
             })
             .then(response => response.json())

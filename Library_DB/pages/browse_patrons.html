@@ -99,7 +99,7 @@
 
         // Fetches patron data from the server and populates the table
         function fetchPatrons() {
-            fetch('http://read-renaissance.com/api/patrons')
+            fetch(`${API_BASE_URL}/api/patrons`)
                 .then(response => response.json())
                 .then(data => populateTable(data))
                 .catch(error => console.error('Error fetching patrons:', error));
@@ -155,7 +155,7 @@
 
             const formData = { firstName, lastName, email, membershipDate, address, phone };
 
-            fetch(`http://read-renaissance.com/api/patrons/${patronID}`, {
+            fetch(`${API_BASE_URL}/api/patrons/${patronID}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData)
@@ -190,7 +190,7 @@
 
             const formData = { firstName, lastName, email, membershipDate, address, phone };
 
-            fetch('http://read-renaissance.com/api/patrons', {
+            fetch(`${API_BASE_URL}/api/patrons`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData)
@@ -211,7 +211,7 @@
 
         // Deletes a patron from the database and refreshes the table
         function deletePatron(patronID) {
-            fetch(`http://read-renaissance.com/api/patrons/${patronID}`, {
+            fetch(`${API_BASE_URL}/api/patrons/${patronID}`, {
                 method: 'DELETE'
             })
             .then(response => response.json())

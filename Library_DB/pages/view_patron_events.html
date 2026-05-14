@@ -97,7 +97,7 @@
 
         // Fetch events and populate UI
         function fetchEvents() {
-            fetch('http://read-renaissance.com/api/events')
+            fetch('${API_BASE_URL}/api/events')
                 .then(response => response.json())
                 .then(data => {
                     populateTable(data);
@@ -107,7 +107,7 @@
 
         // Fetch staff data to populate select options
         function fetchStaff() {
-            fetch('http://read-renaissance.com/api/staff')
+            fetch('${API_BASE_URL}/api/staff')
                 .then(response => response.json())
                 .then(staffMembers => {
                     populateSelect(staffMembers, 'staffId');
@@ -181,7 +181,7 @@
                 staffID: parseInt(form.staffId.value)
             };
 
-            fetch('http://read-renaissance.com/api/events', {
+            fetch('${API_BASE_URL}/api/events', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(eventData)
@@ -226,7 +226,7 @@
                 staffID: parseInt(form.editStaffId.value)
             };
 
-            fetch(`http://read-renaissance.com/api/events/${eventId}`, {
+            fetch(`${API_BASE_URL}/api/events/${eventId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(eventData)
@@ -241,7 +241,7 @@
 
         // Delete an event
         function deleteEvent(eventId) {
-            fetch(`http://read-renaissance.com/api/events/${eventId}`, {
+            fetch(`${API_BASE_URL}/api/events/${eventId}`, {
                 method: 'DELETE'
             })
             .then(response => response.json())
