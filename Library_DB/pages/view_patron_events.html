@@ -37,7 +37,6 @@
                 <th>Event Name</th>
                 <th>Event Date</th>
                 <th>Description</th>
-                <th>Attendance</th>
                 <th>Staff</th>
                 <th>Actions</th>
             </tr>
@@ -59,8 +58,6 @@
                 <input type="datetime-local" id="eventDate" name="eventDate" required>
                 <label for="description">Description (Optional):</label>
                 <textarea id="description" name="description"></textarea>
-                <label for="attendance">Attendance (Optional):</label>
-                <input type="number" id="attendance" name="attendance">
                 <label for="staffId">Staff (Required):</label>
                 <select id="staffId" name="staffId" required></select>
                 <button type="button" onclick="addEvent()">Submit</button>
@@ -78,8 +75,6 @@
                 <input type="datetime-local" id="editEventDate" required>
                 <label for="editDescription">Description (Optional):</label>
                 <textarea id="editDescription"></textarea>
-                <label for="editAttendance">Attendance (Optional):</label>
-                <input type="number" id="editAttendance">
                 <label for="editStaffId">Staff (Required):</label>
                 <select id="editStaffId" required></select>
                 <button type="button" onclick="updateEvent()">Update</button>
@@ -87,17 +82,17 @@
         </form>
     </div>
 
-    <!-- JavaScript for CRUD operations and UI interaction -->
     <script>
+        const API_BASE_URL = 'http://localhost:3000';
+
         document.addEventListener("DOMContentLoaded", function() {
-            // Initialize data loading
             fetchEvents();
             fetchStaff();
         });
 
         // Fetch events and populate UI
         function fetchEvents() {
-            fetch('${API_BASE_URL}/api/events')
+            fetch(`${API_BASE_URL}/api/events`)
                 .then(response => response.json())
                 .then(data => {
                     populateTable(data);
@@ -107,7 +102,7 @@
 
         // Fetch staff data to populate select options
         function fetchStaff() {
-            fetch('${API_BASE_URL}/api/staff')
+            fetch(`${API_BASE_URL}/api/staff`)
                 .then(response => response.json())
                 .then(staffMembers => {
                     populateSelect(staffMembers, 'staffId');
@@ -127,7 +122,6 @@
                     <td>${event.eventName}</td>
                     <td>${new Date(event.event_Date).toLocaleString()}</td>
                     <td>${event.description}</td>
-                    <td>${event.attendance || 'N/A'}</td>
                     <td>${event.staffID}</td>
                     <td>
                         <button onclick="fillEditForm(this)" data-event='${JSON.stringify(event)}'>Edit</button>
@@ -137,13 +131,13 @@
             });
         }
 
-        // Populate select elements with staff or other data
+        // Populate select elements with staff data
         function populateSelect(items, selectId) {
             const select = document.getElementById(selectId);
             select.innerHTML = '';
             items.forEach(item => {
                 const option = document.createElement('option');
-                option.value = item.staffId;  // Assuming staffId for simplicity, adjust based on actual data keys
+                option.value = item.staffId;
                 option.text = `${item.firstName} ${item.lastName}`;
                 select.appendChild(option);
             });
@@ -163,7 +157,7 @@
             return valid;
         }
 
-        // Handle form submissions for adding and updating events
+        // Handle form submissions for adding events
         function addEvent() {
             const form = document.getElementById('addEventForm');
             if (!validateForm(form)) {
@@ -171,17 +165,14 @@
                 return;
             }
 
-            const description = form.description.value.trim() || 'N/A';
-
             const eventData = {
                 eventName: form.eventName.value,
                 event_Date: form.eventDate.value,
-                description: description,
-                attendance: parseInt(form.attendance.value) || null,
+                description: form.description.value.trim() || 'N/A',
                 staffID: parseInt(form.staffId.value)
             };
 
-            fetch('${API_BASE_URL}/api/events', {
+            fetch(`${API_BASE_URL}/api/events`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(eventData)
@@ -189,8 +180,8 @@
             .then(response => response.json())
             .then(data => {
                 alert('Event added successfully!');
-                fetchEvents();  // Refresh the events list
-                form.reset();  // Clear the form after successful submission
+                fetchEvents();
+                form.reset();
             })
             .catch(error => console.error('Error adding event:', error));
         }
@@ -201,9 +192,8 @@
             const form = document.getElementById('editEventForm');
             form.editEventId.value = eventData.eventID;
             form.editEventName.value = eventData.eventName;
-            form.editEventDate.value = eventData.event_Date.substring(0, 16); // For datetime-local input
+            form.editEventDate.value = eventData.event_Date.substring(0, 16);
             form.editDescription.value = eventData.description;
-            form.editAttendance.value = eventData.attendance || '';
             form.editStaffId.value = eventData.staffID;
         }
 
@@ -215,14 +205,11 @@
                 return;
             }
 
-            const description = form.editDescription.value.trim() || 'N/A';
-
             const eventId = form.editEventId.value;
             const eventData = {
                 eventName: form.editEventName.value,
                 event_Date: form.editEventDate.value,
-                description: description,
-                attendance: parseInt(form.editAttendance.value) || null,
+                description: form.editDescription.value.trim() || 'N/A',
                 staffID: parseInt(form.editStaffId.value)
             };
 
@@ -234,7 +221,7 @@
             .then(response => response.json())
             .then(data => {
                 alert('Event updated successfully!');
-                fetchEvents();  // Refresh the events list
+                fetchEvents();
             })
             .catch(error => console.error('Error updating event:', error));
         }
@@ -247,7 +234,7 @@
             .then(response => response.json())
             .then(() => {
                 alert('Event deleted successfully!');
-                fetchEvents();  // Refresh the events list
+                fetchEvents();
             })
             .catch(error => console.error('Error deleting event:', error));
         }
@@ -261,7 +248,7 @@
             for (let i = 0; i < tr.length; i++) {
                 let td = tr[i].getElementsByTagName("td");
                 let visible = false;
-                for (let j = 0; j < td.length - 1; j++) {  // Exclude the last column from search
+                for (let j = 0; j < td.length - 1; j++) {
                     if (td[j] && td[j].textContent.toUpperCase().indexOf(filter) > -1) {
                         visible = true;
                         break;

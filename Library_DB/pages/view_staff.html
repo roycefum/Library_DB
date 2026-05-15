@@ -1,4 +1,3 @@
-
 <!-- Code is mostly original with the excepiton of the given boilerplate html code provided from all popular IDEs -->
 
 <!DOCTYPE html>
@@ -66,7 +65,7 @@
         <form id="editStaffForm" class="half-width" onsubmit="updateStaff(event)">
             <fieldset>
                 <legend>Edit Staff Member</legend>
-                <input type="hidden" id="editStaffId"> <!-- Hidden field for storing staff ID -->
+                <input type="hidden" id="editStaffId">
                 <label for="editFirstName">First Name (Required):</label>
                 <input type="text" id="editFirstName" required><br>
                 <label for="editLastName">Last Name (Required):</label>
@@ -78,18 +77,19 @@
         </form>
     </div>
 
-    <!-- Scripts to manage interaction and API integration -->
     <script>
+        const API_BASE_URL = 'http://localhost:3000';
+
         document.addEventListener("DOMContentLoaded", function() {
-            fetchStaff(); // Load staff data when the document is ready
+            fetchStaff();
         });
 
         // Fetches staff data from the server
         function fetchStaff() {
-            fetch('${API_BASE_URL}/api/staff')
+            fetch(`${API_BASE_URL}/api/staff`)
                 .then(response => response.json())
                 .then(data => {
-                    populateTable(data); // Populate table with fetched data
+                    populateTable(data);
                 })
                 .catch(error => console.error('Error fetching staff:', error));
         }
@@ -126,7 +126,7 @@
                 return;
             }
 
-            fetch('${API_BASE_URL}/api/staff', {
+            fetch(`${API_BASE_URL}/api/staff`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ firstName, lastName, position })
@@ -134,7 +134,7 @@
             .then(response => response.json())
             .then(data => {
                 alert('Staff member added successfully!');
-                fetchStaff(); // Refresh the table
+                fetchStaff();
                 form.reset();
             })
             .catch(error => console.error('Error adding staff member:', error));
@@ -161,7 +161,7 @@
             .then(response => response.json())
             .then(data => {
                 alert('Staff updated successfully!');
-                fetchStaff(); // Refresh the table
+                fetchStaff();
             })
             .catch(error => {
                 console.error('Error updating staff:', error);
@@ -189,7 +189,7 @@
             .then(response => response.json())
             .then(data => {
                 alert('Staff member deleted successfully!');
-                fetchStaff(); // Refresh the table
+                fetchStaff();
             })
             .catch(error => {
                 console.error('Error deleting staff:', error);

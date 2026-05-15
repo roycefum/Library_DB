@@ -90,8 +90,9 @@
         </form>
     </div>
 
-    <!-- JavaScript to Manage Patrons -->
     <script>
+        const API_BASE_URL = 'http://localhost:3000';
+
         // Load patron data when the document is fully loaded
         document.addEventListener("DOMContentLoaded", function() {
             fetchPatrons();
@@ -108,7 +109,7 @@
         // Populates the patrons table with data retrieved from the server
         function populateTable(patrons) {
             const tableBody = document.getElementById('patronsTable').getElementsByTagName('tbody')[0];
-            tableBody.innerHTML = ''; // Clears existing table data
+            tableBody.innerHTML = '';
             patrons.forEach(patron => {
                 const row = tableBody.insertRow();
                 row.innerHTML = `
@@ -232,7 +233,7 @@
             for (let i = 0; i < tr.length; i++) {
                 let td = tr[i].getElementsByTagName("td");
                 let visible = false;
-                for (let j = 0; j < td.length - 1; j++) {  // Exclude the last column from search
+                for (let j = 0; j < td.length - 1; j++) {
                     if (td[j] && td[j].textContent.toUpperCase().indexOf(filter) > -1) {
                         visible = true;
                     }
