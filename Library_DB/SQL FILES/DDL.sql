@@ -54,7 +54,7 @@ CREATE TABLE Book_Transactions (
     patronID int,
     numberBooks int,
     staffID int,
-    date date NOT NULL,
+    transactionDate date NOT NULL,
     PRIMARY KEY (transactionID),
     FOREIGN KEY (patronID) REFERENCES Patrons(patronID),
     FOREIGN KEY (staffID) REFERENCES Staff(staffID)
@@ -93,6 +93,17 @@ CREATE TABLE Patron_Events_Attendance (
     FOREIGN KEY (eventID) REFERENCES Patron_Events(eventID) ON DELETE CASCADE
 );
 
+-- Creating table for Settings
+CREATE TABLE Settings (
+    settingID int NOT NULL AUTO_INCREMENT,
+    settingName varchar(255) NOT NULL UNIQUE,
+    settingValue varchar(255) NOT NULL,
+    PRIMARY KEY (settingID)
+);
+
+-- Default loan period
+INSERT INTO Settings (settingName, settingValue) VALUES ('loan_period_days', '14');
+
 -- Insert statements for each table
 INSERT INTO Patrons (first_name, last_name, membershipDate, email, address, phone) VALUES
 ('James', 'Kirk', '1964-03-15', 'jkirk@gmail.com', '1324 Random Ln', '555-387-9900'),
@@ -106,7 +117,7 @@ INSERT INTO Books (title, author, isbn, publishedYear, genre) VALUES
 ('Robinson Crusoe', 'Daniel Defoe', '3234567890323', 1875, 'survival'),
 ('The Color Purple','Alice Walker', '4234567890423', 1966, 'drama');
 
-INSERT INTO Book_Transactions (patronID, numberBooks, staffID, date) VALUES
+INSERT INTO Book_Transactions (patronID, numberBooks, staffID, transactionDate) VALUES
 (3,2,1,'2024-04-27'),
 (4,4,1,'2024-04-28'),
 (1,4,2,'2024-04-29'),

@@ -15,6 +15,7 @@
         <nav>
             <a href="../index.html">Home</a>
             <a href="browse_books.html">Books</a>
+            <a href="book_checkout.html">Checkout Books</a>
             <a href="view_book_transactions.html">Book Transactions</a>
             <a href="browse_patrons.html">Patrons</a>
             <a href="view_patron_events.html">Patron Events</a>
@@ -93,7 +94,7 @@
                 <th>Transaction Details ID</th>
                 <th>Transaction ID</th>
                 <th>Book ID</th>
-                <th>Date</th>
+                <th>Return Date</th>
                 <th>Due Date</th>
             </tr>
         </thead>
@@ -103,6 +104,8 @@
     </table>
 
     <script>
+        
+        const API_BASE_URL = 'http://localhost:3000';
         // Initial data loading when document is ready
         document.addEventListener("DOMContentLoaded", function() {
             fetchTransactions();
@@ -133,7 +136,7 @@
 
         // Fetch and populate staff IDs for form selections
         function fetchStaffIDs() {
-            fetch('${API_BASE_URL}/api/staff')
+            fetch(`${API_BASE_URL}/api/staff`)
                 .then(response => response.json())
                 .then(data => {
                     const staffSelect = document.getElementById('staffID');
@@ -153,49 +156,70 @@
 
         // Fetch and display transactions in the table
         function fetchTransactions() {
-            fetch('${API_BASE_URL}/api/transactions')
+            fetch(`${API_BASE_URL}/api/transactions`)
                 .then(response => response.json())
                 .then(data => populateTable(data, 'transactionsTable'))
                 .catch(error => console.error('Error fetching transactions:', error));
         }
 
-        // Populate transactions table with data
-        function populateTable(data, tableID) {
-            const tableBody = document.getElementById(tableID).getElementsByTagName('tbody')[0];
-            tableBody.innerHTML = '';
-            data.forEach(item => {
-                const row = tableBody.insertRow();
-                row.innerHTML = `
-                    <td>${item.transactionID || item.transactionDetailsID}</td>
-                    <td>${item.patronID || item.transactionID}</td>
-                    <td>${item.numberBooks || item.bookID}</td>
-                    <td>${item.staffID || item.date}</td>
-                    <td>${item.date || item.dueDate}</td>
-                    ${item.numberBooks ? `<td>
-                        <button onclick="editTransaction(${item.transactionID}, ${item.patronID}, ${item.numberBooks}, ${item.staffID}, '${item.date}')">Edit</button>
-                        <button onclick="deleteTransaction(${item.transactionID})">Delete</button>
-                    </td>` : ''}
-                `;
-            });
-        }
+        // Populate transactions table
+function populateTransactionsTable(data) {
+    const tableBody = document.getElementById('transactionsTable').getElementsByTagName('tbody')[0];
+    tableBody.innerHTML = '';
+    data.forEach(item => {
+        const row = tableBody.insertRow();
+        row.innerHTML = `
+            <td>${item.transactionID}</td>
+            <td>${item.patronID}</td>
+            <td>${item.numberBooks}</td>
+            <td>${item.staffID}</td>
+            <td>${item.transactionDate ? item.transactionDate.split('T')[0] : ''}</td>
+            <td>
+                <button onclick="editTransaction(${item.transactionID}, ${item.patronID}, ${item.numberBooks}, ${item.staffID}, '${item.transactionDate}')">Edit</button>
+                <button onclick="deleteTransaction(${item.transactionID})">Delete</button>
+            </td>
+        `;
+    });
+}
 
-        // Fetch and display book transaction details
-        function fetchTransactionDetails() {
-            fetch('${API_BASE_URL}/api/bt_details')
-                .then(response => response.json())
-                .then(details => populateTable(details, 'transactionDetailsTable'))
-                .catch(error => console.error('Error fetching transaction details:', error));
-        }
+// Populate transaction details table
+function populateTransactionDetailsTable(data) {
+    const tableBody = document.getElementById('transactionDetailsTable').getElementsByTagName('tbody')[0];
+    tableBody.innerHTML = '';
+    data.forEach(item => {
+        const row = tableBody.insertRow();
+        row.innerHTML = `
+            <td>${item.transactionDetailsID}</td>
+            <td>${item.transactionID}</td>
+            <td>${item.bookID}</td>
+            <td>${item.dueDate ? item.dueDate.split('T')[0] : ''}</td>
+            <td>${item.returnDate ? item.returnDate.split('T')[0] : 'Not Returned'}</td>
+        `;
+    });
+}
 
+        function fetchTransactions() {
+    fetch(`${API_BASE_URL}/api/transactions`)
+        .then(response => response.json())
+        .then(data => populateTransactionsTable(data))
+        .catch(error => console.error('Error fetching transactions:', error));
+}
+
+function fetchTransactionDetails() {
+    fetch(`${API_BASE_URL}/api/bt_details`)
+        .then(response => response.json())
+        .then(details => populateTransactionDetailsTable(details))
+        .catch(error => console.error('Error fetching transaction details:', error));
+}
         // Add a new transaction to the system
         function addTransaction() {
             const form = document.getElementById('addTransactionForm');
             const patronID = form.patronID.value.trim();
             const numberBooks = form.numberBooks.value.trim();
             const staffID = form.staffID.value.trim();
-            const date = form.date.value.trim();
+            const transactionDate = form.date.value.trim();
 
-            if (!patronID || !numberBooks || !staffID || !date) {
+            if (!patronID || !numberBooks || !staffID || !transactionDate) {
                 alert('All fields are required. Please fill out all fields.');
                 return;
             }
@@ -204,10 +228,10 @@
                 patronID: parseInt(patronID, 10),
                 numberBooks: parseInt(numberBooks, 10),
                 staffID: parseInt(staffID, 10),
-                date: date
+                transactionDate: transactionDate
             };
 
-            fetch('${API_BASE_URL}/api/transactions', {
+            fetch(`${API_BASE_URL}/api/transactions`,{
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData)
@@ -227,12 +251,12 @@
         }
 
         // Load transaction data into the edit form
-        function editTransaction(transactionID, patronID, numberBooks, staffId, date) {
+        function editTransaction(transactionID, patronID, numberBooks, staffId, transactionDate) {
             document.getElementById('editTransactionID').value = transactionID;
             document.getElementById('editPatronID').value = patronID;
             document.getElementById('editNumberBooks').value = numberBooks;
             document.getElementById('editStaffID').value = staffId;
-            document.getElementById('editDate').value = date;
+            document.getElementById('editDate').value = transactionDate;
         }
 
         // Update an existing transaction
@@ -241,9 +265,9 @@
             const patronID = document.getElementById('editPatronID').value.trim();
             const numberBooks = document.getElementById('editNumberBooks').value.trim();
             const staffID = document.getElementById('editStaffID').value.trim();
-            const date = document.getElementById('editDate').value.trim();
+            const transactionDate = document.getElementById('editDate').value.trim();
 
-            if (!patronID || !numberBooks || !staffID || !date) {
+            if (!patronID || !numberBooks || !staffID || !transactionDate) {
                 alert('All fields are required. Please fill out all fields.');
                 return;
             }
@@ -252,7 +276,7 @@
                 patronID: parseInt(patronID, 10),
                 numberBooks: parseInt(numberBooks, 10),
                 staffID: parseInt(staffID, 10),
-                date: date
+                transactionDate:transactionDate
             };
 
             fetch(`${API_BASE_URL}/api/transactions/${transactionID}`, {

@@ -20,11 +20,11 @@ exports.getAllTransactions = async (req, res) => {
 };
 
 exports.addTransaction = async (req, res) => {
-    const { patronID, numberBooks, staffID, date } = req.body;
+    const { patronID, numberBooks, staffID, transactionDate } = req.body;
     try {
         const result = await executeQuery(
-            'INSERT INTO Book_Transactions (patronID, numberBooks, staffID, date) VALUES (?, ?, ?, ?)',
-            [patronID, numberBooks, staffID, date]
+            'INSERT INTO Book_Transactions (patronID, numberBooks, staffID, transactionDate) VALUES (?, ?, ?, ?)',
+            [patronID, numberBooks, staffID, transactionDate]
         );
         res.json({ message: "Transaction added successfully!", transactionID: result.insertId });
     } catch (err) {
@@ -48,11 +48,11 @@ exports.deleteTransaction = async (req, res) => {
 
 exports.updateTransaction = async (req, res) => {
     const { transactionID } = req.params;
-    const { patronID, numberBooks, staffID, date } = req.body;
+    const { patronID, numberBooks, staffID, transactionDate } = req.body;
     try {
         const result = await executeQuery(
-            `UPDATE Book_Transactions SET patronID = ?, numberBooks = ?, staffID = ?, date = ? WHERE transactionID = ?`,
-            [patronID, numberBooks, staffID, date, transactionID]
+            `UPDATE Book_Transactions SET patronID = ?, numberBooks = ?, staffID = ?, transactionDate = ? WHERE transactionID = ?`,
+            [patronID, numberBooks, staffID, transactionDate, transactionID]
         );
         if (result.affectedRows) {
             res.json({ message: "Transaction updated successfully!" });
@@ -60,6 +60,52 @@ exports.updateTransaction = async (req, res) => {
             res.status(404).json({ message: "Transaction not found!" });
         }
     } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+exports.checkout = async (req, res) => {
+    const { patronID, staffID, transactionDate, bookIDs } = req.body;
+    
+    if (!patronID || !staffID || !transactionDate || !bookIDs || bookIDs.length === 0) {
+        return res.status(400).json({ message: "Missing required fields." });
+    }
+
+    try {
+        await executeQuery('START TRANSACTION');
+
+        // Get loan period from settings
+        const setting = await executeQuery(
+            "SELECT settingValue FROM Settings WHERE settingName = 'loan_period_days'"
+        );
+        const loanPeriod = parseInt(setting[0].settingValue, 10);
+
+        // Create the transaction header
+        const transaction = await executeQuery(
+            'INSERT INTO Book_Transactions (patronID, numberBooks, staffID, transactionDate) VALUES (?, ?, ?, ?)',
+            [patronID, bookIDs.length, staffID, transactionDate]
+        );
+
+        const transactionID = transaction.insertId;
+
+        // Calculate due date from settings
+        const dueDate = new Date(transactionDate);
+        dueDate.setDate(dueDate.getDate() + loanPeriod);
+        const dueDateStr = dueDate.toISOString().split('T')[0];
+
+        // Create a details row for each book
+        for (const bookID of bookIDs) {
+            await executeQuery(
+                'INSERT INTO Book_Transaction_Details (transactionID, bookID, dueDate) VALUES (?, ?, ?)',
+                [transactionID, bookID, dueDateStr]
+            );
+        }
+
+        await executeQuery('COMMIT');
+        res.json({ message: "Checkout successful!", transactionID });
+
+    } catch (err) {
+        await executeQuery('ROLLBACK');
         res.status(500).json({ error: err.message });
     }
 };
