@@ -5,5 +5,8 @@ const express = require('express');
 const router = express.Router();
 const bt_detailsController = require('../controllers/bt_detailsController');
 
-router.use('/', bt_detailsController.getAllTransactionDetails);
+router.get('/', bt_detailsController.getAllTransactionDetails);
+router.get('/patron/:patronID', bt_detailsController.getCheckedOutByPatron);
+router.put('/checkin/:transactionDetailsID', bt_detailsController.checkInBook);
+
 module.exports = router;

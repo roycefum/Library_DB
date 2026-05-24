@@ -23,6 +23,8 @@ nav {
     font-family: 'Averia Serif Libre', serif;
 }
 
+
+
 legend {
     font-size: 24px;
 }
@@ -80,9 +82,9 @@ button:hover {
 nav {
     padding-top: 8px;
     padding-bottom: 8px;
-    flex-direction: row;
-    max-width: 100px;
-    display: table-row;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
 }
 
 nav a {
@@ -104,6 +106,12 @@ nav a:hover {
     background-color: var(--veryDarkBlue);
     color: var(--veryLightBlue);
     border: 3px solid var(--veryLightBlue);
+}
+
+nav a.active {
+    background-color: var(--veryDarkBlue);
+    color: var(--darkSand);
+    border: 3px solid var(--darkSand);
 }
 
 /* ----- Form Container Styling ----- */

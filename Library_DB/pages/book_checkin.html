@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Check In</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Book Check In</h1>
+        <nav>
+            <a href="../index.html">Home</a>
+            <a href="book_checkout.html">Checkout Books</a>
+            <a href="book_checkin.html" class="active">Check In Books</a>
+            <a href="browse_books.html">Books</a>
+            <a href="view_book_transactions.html">Book Transactions</a>
+            <a href="browse_patrons.html">Patrons</a>
+            <a href="view_patron_events.html">Patron Events</a>
+            <a href="view_patron_attendance.html">Patron Attendance</a>
+            <a href="view_staff.html">Staff</a>
+        </nav>
+    </header>
+
+    <!-- Patron selector -->
+    <div class="form-container">
+        <fieldset>
+            <legend>Select Patron</legend>
+            <label for="patronID">Patron:</label>
+            <select id="patronID" onchange="fetchCheckedOutBooks()"></select>
+        </fieldset>
+    </div>
+
+    <!-- Checked out books table -->
+    <h2>Books Currently Checked Out</h2>
+    <table id="checkedOutTable">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Genre</th>
+                <th>Transaction Date</th>
+                <th>Due Date</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:3000';
+
+        document.addEventListener("DOMContentLoaded", function() {
+            fetchPatrons();
+        });
+
+        function fetchPatrons() {
+    fetch(`${API_BASE_URL}/api/patrons`)
+        .then(response => response.json())
+        .then(data => {
+            const select = document.getElementById('patronID');
+            // Add a default empty option
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.text = '-- Select a Patron --';
+            select.appendChild(defaultOption);
+            data.forEach(patron => {
+                const option = document.createElement('option');
+                option.value = patron.patronID;
+                option.text = `${patron.first_name} ${patron.last_name}`;
+                select.appendChild(option);
+            });
+        })
+        .catch(error => console.error('Error fetching patrons:', error));
+}
+
+function fetchCheckedOutBooks() {
+    const patronID = document.getElementById('patronID').value;
+    if (!patronID) return;
+
+    fetch(`${API_BASE_URL}/api/bt_details/patron/${patronID}`)
+        .then(response => response.json())
+        .then(data => populateCheckedOutTable(data))
+        .catch(error => console.error('Error fetching checked out books:', error));
+}
+
+function populateCheckedOutTable(books) {
+    const tableBody = document.getElementById('checkedOutTable').getElementsByTagName('tbody')[0];
+    tableBody.innerHTML = '';
+
+    if (books.length === 0) {
+        const row = tableBody.insertRow();
+        row.innerHTML = `<td colspan="6">No books currently checked out.</td>`;
+        return;
+    }
+
+    books.forEach(book => {
+        const row = tableBody.insertRow();
+        const dueDate = new Date(book.dueDate);
+        const today = new Date();
+        const isOverdue = dueDate < today;
+
+        row.innerHTML = `
+            <td>${book.title}</td>
+            <td>${book.author || 'N/A'}</td>
+            <td>${book.genre || 'N/A'}</td>
+            <td>${book.transactionDate.split('T')[0]}</td>
+            <td style="color: ${isOverdue ? 'red' : 'inherit'}">${book.dueDate.split('T')[0]}</td>
+            <td><button onclick="checkIn(${book.transactionDetailsID})">Check In</button></td>
+        `;
+    });
+}
+
+function checkIn(transactionDetailsID) {
+    fetch(`${API_BASE_URL}/api/bt_details/checkin/${transactionDetailsID}`, {
+        method: 'PUT'
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message);
+        fetchCheckedOutBooks();
+    })
+    .catch(error => console.error('Error checking in book:', error));
+}
+    </script>
+</body>
+</html>
+

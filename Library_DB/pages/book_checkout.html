@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Checkout</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Book Checkout</h1>
+        <nav>
+            <a href="../index.html">Home</a>
+            <a href="browse_books.html">Books</a>
+            <a href="book_checkout.html">Checkout Books</a>
+            <a href="view_book_transactions.html">Book Transactions</a>
+            <a href="browse_patrons.html">Patrons</a>
+            <a href="view_patron_events.html">Patron Events</a>
+            <a href="view_patron_attendance.html">Patron Attendance</a>
+            <a href="view_staff.html">Staff</a>
+        </nav>
+    </header>
+
+    <!-- Checkout Form -->
+<div class="form-container">
+    <fieldset>
+        <legend>New Checkout</legend>
+        <label for="patronID">Patron (Required):</label>
+        <select id="patronID" required></select>
+
+        <label for="staffID">Staff (Required):</label>
+        <select id="staffID" required></select>
+
+        <label for="transactionDate">Date (Required):</label>
+        <input type="date" id="transactionDate" required>
+    </fieldset>
+</div>
+
+   <!-- Available Books -->
+<h2>Available Books</h2>
+<div class="filter-container">
+    <input type="text" id="filterInput" onkeyup="filterBooks()" placeholder="Search for books...">
+</div>
+<table id="availableBooksTable">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Genre</th>
+            <th>ISBN</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+   <!-- Cart -->
+<h2>Cart</h2>
+<table id="cartTable">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Genre</th>
+            <th>Published Year</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+<p>Total Books: <span id="cartCount">0</span></p>
+<button onclick="checkout()">Checkout</button>
+
+
+    <script>
+        const API_BASE_URL = 'http://localhost:3000';
+        let cart = [];
+
+        document.addEventListener("DOMContentLoaded", function() {
+    fetchPatrons();
+    fetchStaff();
+    fetchAvailableBooks();
+});
+
+function fetchPatrons() {
+    fetch(`${API_BASE_URL}/api/patrons`)
+        .then(response => response.json())
+        .then(data => {
+            const select = document.getElementById('patronID');
+            data.forEach(patron => {
+                const option = document.createElement('option');
+                option.value = patron.patronID;
+                option.text = `${patron.first_name} ${patron.last_name}`;
+                select.appendChild(option);
+            });
+        })
+        .catch(error => console.error('Error fetching patrons:', error));
+}
+
+function fetchStaff() {
+    fetch(`${API_BASE_URL}/api/staff`)
+        .then(response => response.json())
+        .then(data => {
+            const select = document.getElementById('staffID');
+            data.forEach(staff => {
+                const option = document.createElement('option');
+                option.value = staff.staffId;
+                option.text = `${staff.firstName} ${staff.lastName}`;
+                select.appendChild(option);
+            });
+        })
+        .catch(error => console.error('Error fetching staff:', error));
+}
+
+function fetchAvailableBooks() {
+    fetch(`${API_BASE_URL}/api/books`)
+        .then(response => response.json())
+        .then(books => {
+            const available = books.filter(book => book.status === 'Available');
+            populateBooksTable(available);
+        })
+        .catch(error => console.error('Error fetching books:', error));
+}
+
+function populateBooksTable(books) {
+    const tableBody = document.getElementById('availableBooksTable').getElementsByTagName('tbody')[0];
+    tableBody.innerHTML = '';
+    books.forEach(book => {
+        const row = tableBody.insertRow();
+        row.innerHTML = `
+            <td>${book.title}</td>
+            <td>${book.author || 'N/A'}</td>
+            <td>${book.genre || 'N/A'}</td>
+            <td>${book.isbn}</td>
+<td><button onclick="addToCart(${book.bookID}, '${book.title}', '${book.author || ''}', '${book.genre || ''}', ${book.publishedYear})">Add to Cart</button></td>        `;
+    });
+}
+
+function filterBooks() {
+    let input = document.getElementById("filterInput");
+    let filter = input.value.toUpperCase();
+    let table = document.getElementById("availableBooksTable");
+    let tr = table.getElementsByTagName("tr");
+    for (let i = 0; i < tr.length; i++) {
+        let td = tr[i].getElementsByTagName("td");
+        let visible = false;
+        for (let j = 0; j < td.length - 1; j++) {
+            if (td[j] && td[j].textContent.toUpperCase().indexOf(filter) > -1) {
+                visible = true;
+            }
+        }
+        tr[i].style.display = visible ? "" : "none";
+    }
+}
+
+function addToCart(bookID, title,author,genre,publishedYear) {
+    // Prevent adding the same book twice
+    if (cart.find(item => item.bookID === bookID)) {
+        alert(`${title} is already in the cart.`);
+        return;
+    }
+    cart.push({ bookID, title,author,genre,publishedYear });
+    renderCart();
+}
+
+function removeFromCart(bookID) {
+    cart = cart.filter(item => item.bookID !== bookID);
+    renderCart();
+}
+
+function renderCart() {
+    const tableBody = document.getElementById('cartTable').getElementsByTagName('tbody')[0];
+    tableBody.innerHTML = '';
+    cart.forEach(item => {
+        const row = tableBody.insertRow();
+        row.innerHTML = `
+            <td>${item.title}</td>
+            <td>${item.author || 'N/A'}</td>
+            <td>${item.genre || 'N/A'}</td>
+            <td>${item.publishedYear}</td>
+            <td><button onclick="removeFromCart(${item.bookID})">Remove</button></td>
+        `;
+    });
+    document.getElementById('cartCount').textContent = cart.length;
+}
+
+function checkout() {
+    const patronID = document.getElementById('patronID').value;
+    const staffID = document.getElementById('staffID').value;
+    const transactionDate = document.getElementById('transactionDate').value;
+
+    if (!patronID || !staffID || !transactionDate) {
+        alert('Please fill out all fields before checking out.');
+        return;
+    }
+
+    if (cart.length === 0) {
+        alert('Cart is empty. Please add books before checking out.');
+        return;
+    }
+
+    const payload = {
+        patronID: parseInt(patronID),
+        staffID: parseInt(staffID),
+        transactionDate,
+        bookIDs: cart.map(item => item.bookID)
+    };
+
+    fetch(`${API_BASE_URL}/api/transactions/checkout`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(`Checkout successful! Transaction ID: ${data.transactionID}`);
+        cart = [];
+        renderCart();
+        fetchAvailableBooks();
+    })
+    .catch(error => console.error('Error during checkout:', error));
+}
+    </script>
+</body>
+</html>
