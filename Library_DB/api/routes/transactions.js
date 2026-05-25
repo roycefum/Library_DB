@@ -10,6 +10,7 @@ router.get('/', transactionsController.getAllTransactions);
 router.post('/', transactionsController.addTransaction);
 router.delete('/:transactionID', transactionsController.deleteTransaction);
 router.put('/:transactionID', transactionsController.updateTransaction);
+router.get('/:transactionID/details', transactionsController.getTransactionDetails);
 
 
 module.exports = router;

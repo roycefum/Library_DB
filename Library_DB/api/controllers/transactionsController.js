@@ -22,7 +22,8 @@ exports.getAllTransactions = async (req, res) => {
                 bt.staffID,
                 s.first_name AS staff_first,
                 s.last_name AS staff_last,
-                bt.transactionDate
+                bt.transactionDate,
+                bt.transactionType
             FROM Book_Transactions bt
             JOIN Patrons p ON bt.patronID = p.patronID
             JOIN Staff s ON bt.staffID = s.staffID
@@ -121,6 +122,57 @@ exports.checkout = async (req, res) => {
 
     } catch (err) {
         await executeQuery('ROLLBACK');
+        res.status(500).json({ error: err.message });
+    }
+};
+
+exports.getTransactionDetails = async (req, res) => {
+    const { transactionID } = req.params;
+    try {
+        // Get transaction header with patron and staff names
+        const header = await executeQuery(`
+            SELECT 
+                bt.transactionID,
+                bt.transactionDate,
+                bt.transactionType,
+                bt.numberBooks,
+                bt.patronID,
+                p.first_name,
+                p.last_name,
+                bt.staffID,
+                s.first_name AS staff_first,
+                s.last_name AS staff_last
+            FROM Book_Transactions bt
+            JOIN Patrons p ON bt.patronID = p.patronID
+            JOIN Staff s ON bt.staffID = s.staffID
+            WHERE bt.transactionID = ?
+        `, [transactionID]);
+
+        if (header.length === 0) {
+            return res.status(404).json({ message: "Transaction not found." });
+        }
+
+        // Get all books in this transaction
+        const books = await executeQuery(`
+            SELECT 
+                btd.transactionDetailsID,
+                btd.bookID,
+                b.title,
+                b.author,
+                b.genre,
+                btd.dueDate,
+                btd.returnDate
+            FROM Book_Transaction_Details btd
+            JOIN Books b ON btd.bookID = b.bookID
+            WHERE btd.transactionID = ?
+        `, [transactionID]);
+
+        res.json({
+            transaction: header[0],
+            books: books
+        });
+
+    } catch (err) {
         res.status(500).json({ error: err.message });
     }
 };
