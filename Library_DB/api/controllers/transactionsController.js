@@ -12,7 +12,22 @@ const executeQuery = async (query, params = []) => {
 
 exports.getAllTransactions = async (req, res) => {
     try {
-        const results = await executeQuery('SELECT * FROM Book_Transactions');
+        const results = await executeQuery(`
+            SELECT 
+                bt.transactionID,
+                bt.patronID,
+                p.first_name,
+                p.last_name,
+                bt.numberBooks,
+                bt.staffID,
+                s.first_name AS staff_first,
+                s.last_name AS staff_last,
+                bt.transactionDate
+            FROM Book_Transactions bt
+            JOIN Patrons p ON bt.patronID = p.patronID
+            JOIN Staff s ON bt.staffID = s.staffID
+            ORDER BY bt.transactionID ASC
+        `);
         res.json(results);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -20,11 +35,11 @@ exports.getAllTransactions = async (req, res) => {
 };
 
 exports.addTransaction = async (req, res) => {
-    const { patronID, numberBooks, staffID, transactionDate } = req.body;
+    const { patronID, numberBooks, staffID, transactionDate, transactionType } = req.body;
     try {
         const result = await executeQuery(
-            'INSERT INTO Book_Transactions (patronID, numberBooks, staffID, transactionDate) VALUES (?, ?, ?, ?)',
-            [patronID, numberBooks, staffID, transactionDate]
+            'INSERT INTO Book_Transactions (patronID, numberBooks, staffID, transactionDate, transactionType) VALUES (?, ?, ?, ?)',
+            [patronID, numberBooks, staffID, transactionDate, transactionType]
         );
         res.json({ message: "Transaction added successfully!", transactionID: result.insertId });
     } catch (err) {

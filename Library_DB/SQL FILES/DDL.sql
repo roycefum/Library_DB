@@ -55,6 +55,7 @@ CREATE TABLE Book_Transactions (
     numberBooks int,
     staffID int,
     transactionDate date NOT NULL,
+    transactionType ENUM('checkout', 'checkin', 'renewal') NOT NULL DEFAULT 'checkout',
     PRIMARY KEY (transactionID),
     FOREIGN KEY (patronID) REFERENCES Patrons(patronID),
     FOREIGN KEY (staffID) REFERENCES Staff(staffID)
@@ -117,11 +118,11 @@ INSERT INTO Books (title, author, isbn, publishedYear, genre) VALUES
 ('Robinson Crusoe', 'Daniel Defoe', '3234567890323', 1875, 'survival'),
 ('The Color Purple','Alice Walker', '4234567890423', 1966, 'drama');
 
-INSERT INTO Book_Transactions (patronID, numberBooks, staffID, transactionDate) VALUES
-(3,2,1,'2024-04-27'),
-(4,4,1,'2024-04-28'),
-(1,4,2,'2024-04-29'),
-(2,1,2,'2024-04-30');
+INSERT INTO Book_Transactions (patronID, numberBooks, staffID, transactionDate, transactionType) VALUES
+(3,2,1,'2024-04-27','checkout'),
+(4,4,1,'2024-04-28','checkout'),
+(1,4,2,'2024-04-29','checkout'),
+(2,1,2,'2024-04-30','checkout');
 
 INSERT INTO Staff (first_name, last_name, position) VALUES
 ('William', 'Riker','Manager'),

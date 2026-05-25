@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Book Transactions</title>
     <link rel="stylesheet" href="css/styles.css">
+    <script src="js/utils.js"></script>
 </head>
 <body>
     <!-- Header with navigation -->
@@ -16,7 +17,8 @@
             <a href="../index.html">Home</a>
             <a href="browse_books.html">Books</a>
             <a href="book_checkout.html">Checkout Books</a>
-            <a href="view_book_transactions.html">Book Transactions</a>
+            <a href="book_checkin.html">Check In Books</a>
+            <a href="view_book_transactions.html" class="active">Book Transactions</a>
             <a href="browse_patrons.html">Patrons</a>
             <a href="view_patron_events.html">Patron Events</a>
             <a href="view_patron_attendance.html">Patrons Attendance</a>
@@ -34,11 +36,13 @@
     <table id="transactionsTable">
         <thead>
             <tr>
-                <th>Transaction ID</th>
-                <th>Patron ID</th>
-                <th>Number of Books</th>
-                <th>Staff ID</th>
-                <th>Date</th>
+                <th onclick="sortTable('transactionsTable', 0, 'number')" style="cursor:pointer">Transaction ID ↕</th>
+                <th onclick="sortTable('transactionsTable', 1, 'number')" style="cursor:pointer">Patron ID ↕</th>
+                <th onclick="sortTable('transactionsTable', 2)" style="cursor:pointer">Patron Name ↕</th>
+                <th onclick="sortTable('transactionsTable', 3)" style="cursor:pointer">Staff ↕</th>
+                <th onclick="sortTable('transactionsTable', 4, 'number')" style="cursor:pointer">Number of Books ↕</th>
+                <th onclick="sortTable('transactionsTable', 5, 'date')" style="cursor:pointer">Date ↕</th>
+                <th onclick="sortTable('transactionsTable', 6)" style="cursor:pointer">Type ↕</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -53,14 +57,20 @@
         <form id="addTransactionForm">
             <fieldset>
                 <legend>Add New Transaction</legend>
-                <label for="patronID">Patron ID (Required):</label><br>
+                <label for="patronID">Patron (Required):</label><br>
                 <select id="patronID" name="patronID" required></select><br>
                 <label for="numberBooks">Number of Books (Required):</label><br>
                 <input type="number" id="numberBooks" name="numberBooks" required><br>
-                <label for="staffID">Staff ID (Required):</label><br>
+                <label for="staffID">Staff (Required):</label><br>
                 <select id="staffID" name="staffID" required></select><br>
                 <label for="date">Date (Required):</label><br>
                 <input type="date" id="date" name="date" required><br>
+                <label for="transactionType">Type (Required):</label><br>
+                <select id="transactionType" name="transactionType" required>
+                    <option value="checkout">Checkout</option>
+                    <option value="checkin">Checkin</option>
+                    <option value="renewal">Renewal</option>
+                </select><br>
                 <button type="button" onclick="addTransaction()">Submit</button>
             </fieldset>
         </form>
@@ -70,20 +80,26 @@
             <fieldset>
                 <legend>Edit Transaction</legend>
                 <input type="hidden" id="editTransactionID">
-                <label for="editPatronID">Patron ID (Required):</label><br>
+                <label for="editPatronID">Patron (Required):</label><br>
                 <select id="editPatronID" required></select><br>
                 <label for="editNumberBooks">Number of Books (Required):</label><br>
                 <input type="number" id="editNumberBooks" required><br>
-                <label for="editStaffID">Staff ID (Required):</label><br>
+                <label for="editStaffID">Staff (Required):</label><br>
                 <select id="editStaffID" required></select><br>
                 <label for="editDate">Date (Required):</label><br>
                 <input type="date" id="editDate" required><br>
+                <label for="editTransactionType">Type (Required):</label><br>
+                <select id="editTransactionType" required>
+                    <option value="checkout">Checkout</option>
+                    <option value="checkin">Checkin</option>
+                    <option value="renewal">Renewal</option>
+                </select><br>
                 <button type="button" onclick="updateTransaction()">Update</button>
             </fieldset>
         </form>
     </div>
 
-    <!-- Additional display-only table for transaction details -->
+    <!-- Transaction details table -->
     <h2>Transaction Details</h2>
     <div class="filter-container">
         <input type="text" id="detailsFilterInput" onkeyup="filterTable('transactionDetailsTable')" placeholder="Search for transaction details...">
@@ -91,11 +107,11 @@
     <table id="transactionDetailsTable">
         <thead>
             <tr>
-                <th>Transaction Details ID</th>
-                <th>Transaction ID</th>
-                <th>Book ID</th>
-                <th>Return Date</th>
-                <th>Due Date</th>
+                <th onclick="sortTable('transactionDetailsTable', 0, 'number')" style="cursor:pointer">Details ID ↕</th>
+                <th onclick="sortTable('transactionDetailsTable', 1, 'number')" style="cursor:pointer">Transaction ID ↕</th>
+                <th onclick="sortTable('transactionDetailsTable', 2, 'number')" style="cursor:pointer">Book ID ↕</th>
+                <th onclick="sortTable('transactionDetailsTable', 3, 'date')" style="cursor:pointer">Due Date ↕</th>
+                <th onclick="sortTable('transactionDetailsTable', 4)" style="cursor:pointer">Return Status ↕</th>
             </tr>
         </thead>
         <tbody>
@@ -104,9 +120,8 @@
     </table>
 
     <script>
-        
         const API_BASE_URL = 'http://localhost:3000';
-        // Initial data loading when document is ready
+
         document.addEventListener("DOMContentLoaded", function() {
             fetchTransactions();
             fetchTransactionDetails();
@@ -114,7 +129,6 @@
             fetchStaffIDs();
         });
 
-        // Fetch and populate patron IDs for form selections
         function fetchPatronIDs() {
             fetch(`${API_BASE_URL}/api/patrons`)
                 .then(response => response.json())
@@ -134,7 +148,6 @@
                 .catch(error => console.error('Error fetching patrons:', error));
         }
 
-        // Fetch and populate staff IDs for form selections
         function fetchStaffIDs() {
             fetch(`${API_BASE_URL}/api/staff`)
                 .then(response => response.json())
@@ -154,70 +167,63 @@
                 .catch(error => console.error('Error fetching staff IDs:', error));
         }
 
-        // Fetch and display transactions in the table
         function fetchTransactions() {
             fetch(`${API_BASE_URL}/api/transactions`)
                 .then(response => response.json())
-                .then(data => populateTable(data, 'transactionsTable'))
+                .then(data => populateTransactionsTable(data))
                 .catch(error => console.error('Error fetching transactions:', error));
         }
 
-        // Populate transactions table
-function populateTransactionsTable(data) {
-    const tableBody = document.getElementById('transactionsTable').getElementsByTagName('tbody')[0];
-    tableBody.innerHTML = '';
-    data.forEach(item => {
-        const row = tableBody.insertRow();
-        row.innerHTML = `
-            <td>${item.transactionID}</td>
-            <td>${item.patronID}</td>
-            <td>${item.numberBooks}</td>
-            <td>${item.staffID}</td>
-            <td>${item.transactionDate ? item.transactionDate.split('T')[0] : ''}</td>
-            <td>
-                <button onclick="editTransaction(${item.transactionID}, ${item.patronID}, ${item.numberBooks}, ${item.staffID}, '${item.transactionDate}')">Edit</button>
-                <button onclick="deleteTransaction(${item.transactionID})">Delete</button>
-            </td>
-        `;
-    });
-}
+        function populateTransactionsTable(data) {
+            const tableBody = document.getElementById('transactionsTable').getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = '';
+            data.forEach(item => {
+                const row = tableBody.insertRow();
+                row.innerHTML = `
+                    <td>${item.transactionID}</td>
+                    <td>${item.patronID}</td>
+                    <td>${item.first_name} ${item.last_name}</td>
+                    <td>${item.staff_first} ${item.staff_last}</td>
+                    <td>${item.numberBooks}</td>
+                    <td>${item.transactionDate ? item.transactionDate.split('T')[0] : ''}</td>
+                    <td>${item.transactionType}</td>
+                    <td>
+                        <button onclick="editTransaction(${item.transactionID}, ${item.patronID}, ${item.numberBooks}, ${item.staffID}, '${item.transactionDate}', '${item.transactionType}')">Edit</button>
+                        <button onclick="deleteTransaction(${item.transactionID})">Delete</button>
+                    </td>
+                `;
+            });
+        }
 
-// Populate transaction details table
-function populateTransactionDetailsTable(data) {
-    const tableBody = document.getElementById('transactionDetailsTable').getElementsByTagName('tbody')[0];
-    tableBody.innerHTML = '';
-    data.forEach(item => {
-        const row = tableBody.insertRow();
-        row.innerHTML = `
-            <td>${item.transactionDetailsID}</td>
-            <td>${item.transactionID}</td>
-            <td>${item.bookID}</td>
-            <td>${item.dueDate ? item.dueDate.split('T')[0] : ''}</td>
-            <td>${item.returnDate ? item.returnDate.split('T')[0] : 'Not Returned'}</td>
-        `;
-    });
-}
+        function fetchTransactionDetails() {
+            fetch(`${API_BASE_URL}/api/bt_details`)
+                .then(response => response.json())
+                .then(details => populateTransactionDetailsTable(details))
+                .catch(error => console.error('Error fetching transaction details:', error));
+        }
 
-        function fetchTransactions() {
-    fetch(`${API_BASE_URL}/api/transactions`)
-        .then(response => response.json())
-        .then(data => populateTransactionsTable(data))
-        .catch(error => console.error('Error fetching transactions:', error));
-}
+        function populateTransactionDetailsTable(data) {
+            const tableBody = document.getElementById('transactionDetailsTable').getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = '';
+            data.forEach(item => {
+                const row = tableBody.insertRow();
+                row.innerHTML = `
+                    <td>${item.transactionDetailsID}</td>
+                    <td>${item.transactionID}</td>
+                    <td>${item.bookID}</td>
+                    <td>${item.dueDate ? item.dueDate.split('T')[0] : ''}</td>
+                    <td>${item.returnDate ? item.returnDate.split('T')[0] : 'Not Returned'}</td>
+                `;
+            });
+        }
 
-function fetchTransactionDetails() {
-    fetch(`${API_BASE_URL}/api/bt_details`)
-        .then(response => response.json())
-        .then(details => populateTransactionDetailsTable(details))
-        .catch(error => console.error('Error fetching transaction details:', error));
-}
-        // Add a new transaction to the system
         function addTransaction() {
             const form = document.getElementById('addTransactionForm');
             const patronID = form.patronID.value.trim();
             const numberBooks = form.numberBooks.value.trim();
             const staffID = form.staffID.value.trim();
             const transactionDate = form.date.value.trim();
+            const transactionType = form.transactionType.value;
 
             if (!patronID || !numberBooks || !staffID || !transactionDate) {
                 alert('All fields are required. Please fill out all fields.');
@@ -228,10 +234,11 @@ function fetchTransactionDetails() {
                 patronID: parseInt(patronID, 10),
                 numberBooks: parseInt(numberBooks, 10),
                 staffID: parseInt(staffID, 10),
-                transactionDate: transactionDate
+                transactionDate,
+                transactionType
             };
 
-            fetch(`${API_BASE_URL}/api/transactions`,{
+            fetch(`${API_BASE_URL}/api/transactions`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData)
@@ -250,22 +257,22 @@ function fetchTransactionDetails() {
             .catch(error => console.error('Error adding transaction:', error));
         }
 
-        // Load transaction data into the edit form
-        function editTransaction(transactionID, patronID, numberBooks, staffId, transactionDate) {
+        function editTransaction(transactionID, patronID, numberBooks, staffId, transactionDate, transactionType) {
             document.getElementById('editTransactionID').value = transactionID;
             document.getElementById('editPatronID').value = patronID;
             document.getElementById('editNumberBooks').value = numberBooks;
             document.getElementById('editStaffID').value = staffId;
-            document.getElementById('editDate').value = transactionDate;
+            document.getElementById('editDate').value = transactionDate ? transactionDate.split('T')[0] : '';
+            document.getElementById('editTransactionType').value = transactionType;
         }
 
-        // Update an existing transaction
         function updateTransaction() {
             const transactionID = document.getElementById('editTransactionID').value;
             const patronID = document.getElementById('editPatronID').value.trim();
             const numberBooks = document.getElementById('editNumberBooks').value.trim();
             const staffID = document.getElementById('editStaffID').value.trim();
             const transactionDate = document.getElementById('editDate').value.trim();
+            const transactionType = document.getElementById('editTransactionType').value;
 
             if (!patronID || !numberBooks || !staffID || !transactionDate) {
                 alert('All fields are required. Please fill out all fields.');
@@ -276,7 +283,8 @@ function fetchTransactionDetails() {
                 patronID: parseInt(patronID, 10),
                 numberBooks: parseInt(numberBooks, 10),
                 staffID: parseInt(staffID, 10),
-                transactionDate:transactionDate
+                transactionDate,
+                transactionType
             };
 
             fetch(`${API_BASE_URL}/api/transactions/${transactionID}`, {
@@ -298,7 +306,6 @@ function fetchTransactionDetails() {
             .catch(error => console.error('Error updating transaction:', error));
         }
 
-        // Delete a transaction from the system
         function deleteTransaction(transactionID) {
             fetch(`${API_BASE_URL}/api/transactions/${transactionID}`, {
                 method: 'DELETE'
@@ -311,9 +318,9 @@ function fetchTransactionDetails() {
             .catch(error => console.error('Error deleting transaction:', error));
         }
 
-        // Filter table based on search input
         function filterTable(tableID) {
-            let input = document.getElementById("filterInput");
+            const inputID = tableID === 'transactionDetailsTable' ? 'detailsFilterInput' : 'filterInput';
+            let input = document.getElementById(inputID);
             let filter = input.value.toUpperCase();
             let table = document.getElementById(tableID);
             let tr = table.getElementsByTagName("tr");
