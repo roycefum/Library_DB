@@ -29,7 +29,18 @@ exports.getAllAttendances = async (req, res) => {
 exports.addAttendance = async (req, res) => {
     const { patronID, eventID } = req.body;
     try {
-        const result = await executeQuery('INSERT INTO Patron_Events_Attendance (patronID, eventID) VALUES (?, ?)', [patronID, eventID]);
+        // Check if patron is already registered for this event
+        const existing = await executeQuery(
+            'SELECT * FROM Patron_Events_Attendance WHERE patronID = ? AND eventID = ?',
+            [patronID, eventID]
+        );
+        if (existing.length > 0) {
+            return res.status(400).json({ message: "Patron is already registered for this event." });
+        }
+        const result = await executeQuery(
+            'INSERT INTO Patron_Events_Attendance (patronID, eventID) VALUES (?, ?)',
+            [patronID, eventID]
+        );
         res.json({ message: "Attendance added successfully!", eventsDetailID: result.insertId });
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -56,6 +67,26 @@ exports.updateAttendance = async (req, res) => {
         result.affectedRows
             ? res.json({ message: "Attendance updated successfully!" })
             : res.status(404).json({ message: "Attendance not found!" });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+exports.getAttendanceByEvent = async (req, res) => {
+    const { eventID } = req.params;
+    try {
+        const results = await executeQuery(`
+            SELECT 
+                pea.eventsDetailID,
+                pea.patronID,
+                p.first_name,
+                p.last_name,
+                pea.eventID
+            FROM Patron_Events_Attendance pea
+            JOIN Patrons p ON pea.patronID = p.patronID
+            WHERE pea.eventID = ?
+        `, [eventID]);
+        res.json(results);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

@@ -5,11 +5,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Patron Events</title>
+    <title>Patron Events</title>
     <link rel="stylesheet" href="css/styles.css">
+    <script src="js/utils.js"></script>
 </head>
 <body>
-    <!-- Header with navigation for site navigation -->
     <header>
         <h1>Patron Events</h1>
         <nav>
@@ -20,38 +20,33 @@
             <a href="view_book_transactions.html">Book Transactions</a>
             <a href="browse_patrons.html">Patrons</a>
             <a href="view_patron_events.html" class="active">Patron Events</a>
-            <a href="view_patron_attendance.html">Patron Attendance</a>
             <a href="view_staff.html">Staff</a>
         </nav>
     </header>
 
-    <!-- Search filter section -->
-    <h2>Search</h2>
+    <!-- Events Table -->
+    <h2>Events</h2>
     <div class="filter-container">
-        <input type="text" id="filterInput" onkeyup="filterTable()" placeholder="Search for events...">
+        <input type="text" id="filterInput" onkeyup="filterTable()" placeholder="Search for events..." style="width: 400px">
     </div>
 
-    <!-- Table displaying events -->
     <table id="eventsTable">
         <thead>
             <tr>
-                <th>Event ID</th>
-                <th>Event Name</th>
-                <th>Event Date</th>
-                <th>Description</th>
-                <th>Staff</th>
+                <th onclick="sortTable('eventsTable', 0, 'number')" style="cursor:pointer">Event ID ↕</th>
+                <th onclick="sortTable('eventsTable', 1)" style="cursor:pointer">Event Name ↕</th>
+                <th onclick="sortTable('eventsTable', 2, 'date')" style="cursor:pointer">Event Date ↕</th>
+                <th onclick="sortTable('eventsTable', 3)" style="cursor:pointer">Description ↕</th>
+                <th onclick="sortTable('eventsTable', 4)" style="cursor:pointer">Staff ↕</th>
                 <th>Actions</th>
             </tr>
         </thead>
-        <tbody>
-            <!-- Content dynamically filled by JavaScript -->
-        </tbody>
+        <tbody></tbody>
     </table>
 
-    <!-- Forms for managing events -->
+    <!-- Add / Edit Event Forms -->
     <div class="form-container">
-        <!-- Form for adding new event -->
-        <form id="addEventForm" class="form-style">
+        <form id="addEventForm">
             <fieldset>
                 <legend>Add New Event</legend>
                 <label for="eventName">Event Name (Required):</label>
@@ -66,8 +61,7 @@
             </fieldset>
         </form>
 
-        <!-- Form for editing existing event -->
-        <form id="editEventForm" class="form-style">
+        <form id="editEventForm">
             <fieldset>
                 <legend>Edit Event</legend>
                 <input type="hidden" id="editEventId">
@@ -84,37 +78,57 @@
         </form>
     </div>
 
+    <!-- Attendance Section -->
+    <h2>Event Attendance</h2>
+    <div class="form-container" style="align-items: flex-end;">
+        <div>
+            <label for="attendanceEventSelect">Select Event:</label><br>
+            <select id="attendanceEventSelect" onchange="fetchAttendanceByEvent()" style="width: 300px; padding: 8px;"></select>
+        </div>
+        <div>
+            <label for="addAttendancePatron">Add Patron to Event:</label><br>
+            <select id="addAttendancePatron" style="width: 300px; padding: 8px;"></select>
+            <button onclick="addAttendance()" style="margin-left: 10px;">Add</button>
+            <p id="attendanceError" style="color: red; font-size: 14px; margin: 5px 0 0 0; display: none;"></p>
+        </div>
+    </div>
+
+    <table id="attendanceTable">
+        <thead>
+            <tr>
+                <th onclick="sortTable('attendanceTable', 0, 'number')" style="cursor:pointer">Patron ID ↕</th>
+                <th onclick="sortTable('attendanceTable', 1)" style="cursor:pointer">First Name ↕</th>
+                <th onclick="sortTable('attendanceTable', 2)" style="cursor:pointer">Last Name ↕</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td colspan="3">Select an event to view attendance.</td></tr>
+        </tbody>
+    </table>
+
     <script>
         const API_BASE_URL = 'http://localhost:3000';
 
         document.addEventListener("DOMContentLoaded", function() {
             fetchEvents();
             fetchStaff();
+            fetchPatrons();
         });
 
-        // Fetch events and populate UI
+        // ── Events ──────────────────────────────────────────
+
         function fetchEvents() {
             fetch(`${API_BASE_URL}/api/events`)
                 .then(response => response.json())
                 .then(data => {
-                    populateTable(data);
+                    populateEventsTable(data);
+                    populateEventSelects(data);
                 })
                 .catch(error => console.error('Error fetching events:', error));
         }
 
-        // Fetch staff data to populate select options
-        function fetchStaff() {
-            fetch(`${API_BASE_URL}/api/staff`)
-                .then(response => response.json())
-                .then(staffMembers => {
-                    populateSelect(staffMembers, 'staffId');
-                    populateSelect(staffMembers, 'editStaffId');
-                })
-                .catch(error => console.error('Error fetching staff:', error));
-        }
-
-        // Populate the events table
-        function populateTable(events) {
+        function populateEventsTable(events) {
             const tableBody = document.getElementById('eventsTable').getElementsByTagName('tbody')[0];
             tableBody.innerHTML = '';
             events.forEach(event => {
@@ -124,7 +138,7 @@
                     <td>${event.eventName}</td>
                     <td>${new Date(event.event_Date).toLocaleString()}</td>
                     <td>${event.description}</td>
-                    <td>${event.staffID}</td>
+                    <td>${event.staff_first} ${event.staff_last}</td>
                     <td>
                         <button onclick="fillEditForm(this)" data-event='${JSON.stringify(event)}'>Edit</button>
                         <button onclick="deleteEvent(${event.eventID})">Delete</button>
@@ -133,8 +147,30 @@
             });
         }
 
-        // Populate select elements with staff data
-        function populateSelect(items, selectId) {
+        function populateEventSelects(events) {
+            const select = document.getElementById('attendanceEventSelect');
+            const currentVal = select.value;
+            select.innerHTML = '<option value="">-- Select an Event --</option>';
+            events.forEach(event => {
+                const option = document.createElement('option');
+                option.value = event.eventID;
+                option.text = `${event.eventName} (${new Date(event.event_Date).toLocaleDateString()})`;
+                select.appendChild(option);
+            });
+            if (currentVal) select.value = currentVal;
+        }
+
+        function fetchStaff() {
+            fetch(`${API_BASE_URL}/api/staff`)
+                .then(response => response.json())
+                .then(staffMembers => {
+                    populateStaffSelect(staffMembers, 'staffId');
+                    populateStaffSelect(staffMembers, 'editStaffId');
+                })
+                .catch(error => console.error('Error fetching staff:', error));
+        }
+
+        function populateStaffSelect(items, selectId) {
             const select = document.getElementById(selectId);
             select.innerHTML = '';
             items.forEach(item => {
@@ -145,7 +181,6 @@
             });
         }
 
-        // Validate form fields
         function validateForm(form) {
             let valid = true;
             form.querySelectorAll('input[required], select[required]').forEach(input => {
@@ -159,28 +194,25 @@
             return valid;
         }
 
-        // Handle form submissions for adding events
         function addEvent() {
             const form = document.getElementById('addEventForm');
             if (!validateForm(form)) {
                 alert('Please fill out all required fields.');
                 return;
             }
-
             const eventData = {
                 eventName: form.eventName.value,
                 event_Date: form.eventDate.value,
                 description: form.description.value.trim() || 'N/A',
                 staffID: parseInt(form.staffId.value)
             };
-
             fetch(`${API_BASE_URL}/api/events`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(eventData)
             })
             .then(response => response.json())
-            .then(data => {
+            .then(() => {
                 alert('Event added successfully!');
                 fetchEvents();
                 form.reset();
@@ -188,7 +220,6 @@
             .catch(error => console.error('Error adding event:', error));
         }
 
-        // Fill the edit form when an event is selected to be edited
         function fillEditForm(button) {
             const eventData = JSON.parse(button.getAttribute('data-event'));
             const form = document.getElementById('editEventForm');
@@ -199,14 +230,12 @@
             form.editStaffId.value = eventData.staffID;
         }
 
-        // Update an existing event
         function updateEvent() {
             const form = document.getElementById('editEventForm');
             if (!validateForm(form)) {
                 alert('Please fill out all required fields.');
                 return;
             }
-
             const eventId = form.editEventId.value;
             const eventData = {
                 eventName: form.editEventName.value,
@@ -214,22 +243,21 @@
                 description: form.editDescription.value.trim() || 'N/A',
                 staffID: parseInt(form.editStaffId.value)
             };
-
             fetch(`${API_BASE_URL}/api/events/${eventId}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(eventData)
             })
             .then(response => response.json())
-            .then(data => {
+            .then(() => {
                 alert('Event updated successfully!');
                 fetchEvents();
             })
             .catch(error => console.error('Error updating event:', error));
         }
 
-        // Delete an event
         function deleteEvent(eventId) {
+            if (!confirm('Are you sure you want to delete this event?')) return;
             fetch(`${API_BASE_URL}/api/events/${eventId}`, {
                 method: 'DELETE'
             })
@@ -241,13 +269,103 @@
             .catch(error => console.error('Error deleting event:', error));
         }
 
-        // Filter events based on search input
+        // ── Attendance ───────────────────────────────────────
+
+        function fetchPatrons() {
+            fetch(`${API_BASE_URL}/api/patrons`)
+                .then(response => response.json())
+                .then(patrons => {
+                    const select = document.getElementById('addAttendancePatron');
+                    select.innerHTML = '';
+                    patrons.forEach(patron => {
+                        const option = document.createElement('option');
+                        option.value = patron.patronID;
+                        option.text = `${patron.first_name} ${patron.last_name}`;
+                        select.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error fetching patrons:', error));
+        }
+
+        function fetchAttendanceByEvent() {
+            const eventID = document.getElementById('attendanceEventSelect').value;
+            if (!eventID) return;
+
+            fetch(`${API_BASE_URL}/api/attendances/event/${eventID}`)
+                .then(response => response.json())
+                .then(data => populateAttendanceTable(data))
+                .catch(error => console.error('Error fetching attendance:', error));
+        }
+
+        function populateAttendanceTable(attendances) {
+            const tableBody = document.getElementById('attendanceTable').getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = '';
+
+            if (attendances.length === 0) {
+                const row = tableBody.insertRow();
+                row.innerHTML = `<td colspan="3">No patrons registered for this event.</td>`;
+                return;
+            }
+
+            attendances.forEach(attendance => {
+                const row = tableBody.insertRow();
+                row.innerHTML = `
+                    <td>${attendance.patronID}</td>
+                    <td>${attendance.first_name}</td>
+                    <td>${attendance.last_name}</td>
+                    <td><button onclick="deleteAttendance(${attendance.eventsDetailID})">Remove</button></td>
+                `;
+            });
+        }
+
+        function addAttendance() {
+            const eventID = document.getElementById('attendanceEventSelect').value;
+            const patronID = document.getElementById('addAttendancePatron').value;
+
+            if (!eventID) {
+                alert('Please select an event first.');
+                return;
+            }
+
+            fetch(`${API_BASE_URL}/api/attendances`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ patronID: parseInt(patronID), eventID: parseInt(eventID) })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const errorMsg = document.getElementById('attendanceError');
+                if (data.message === "Patron is already registered for this event.") {
+                    errorMsg.textContent = data.message;
+                    errorMsg.style.display = 'block';
+                    return;
+                }
+                errorMsg.style.display = 'none';
+                fetchAttendanceByEvent();
+            })
+            .catch(error => console.error('Error adding attendance:', error));
+        }
+
+        function deleteAttendance(eventsDetailID) {
+            fetch(`${API_BASE_URL}/api/attendances/${eventsDetailID}`, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(() => {
+                alert('Patron removed from event.');
+                fetchAttendanceByEvent();
+            })
+            .catch(error => console.error('Error deleting attendance:', error));
+        }
+
+        // ── Filter ───────────────────────────────────────────
+
         function filterTable() {
             const input = document.getElementById("filterInput");
             const filter = input.value.toUpperCase();
             const table = document.getElementById("eventsTable");
             const tr = table.getElementsByTagName("tr");
-            for (let i = 0; i < tr.length; i++) {
+            for (let i = 1; i < tr.length; i++) {
                 let td = tr[i].getElementsByTagName("td");
                 let visible = false;
                 for (let j = 0; j < td.length - 1; j++) {

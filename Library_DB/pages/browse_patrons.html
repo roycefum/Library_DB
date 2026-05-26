@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Browse and Edit Patrons</title>
     <link rel="stylesheet" href="css/styles.css">
+    <script src="js/utils.js"></script> 
 </head>
 <body>
     <!-- Navigation and Title Header -->
@@ -28,20 +29,20 @@
     <!-- Search Filter Input -->
     <h2>Search</h2>
     <div class="filter-container">
-        <input type="text" id="filterInput" onkeyup="filterTable()" placeholder="Search for patrons...">
+        <input type="text" id="filterInput" onkeyup="filterTable()" placeholder="Search for patrons..." style = "width:200px">
     </div>
 
     <!-- Patrons Data Table -->
     <table id="patronsTable">
         <thead>
             <tr>
-                <th>Patron ID</th>
-                <th>First Name</th>
-                <th>Last Name</th>
-                <th>Email</th>
-                <th>Membership Date</th>
-                <th>Address</th>
-                <th>Phone</th>
+                <th onclick="sortTable('patronsTable', 0, 'number')" style="cursor:pointer">Patron ID ↕</th>
+                <th onclick="sortTable('patronsTable', 1)" style="cursor:pointer">First Name ↕</th>
+                <th onclick="sortTable('patronsTable', 2)" style="cursor:pointer">Last Name ↕</th>
+                <th onclick="sortTable('patronsTable', 3)" style="cursor:pointer">Email ↕</th>
+                <th onclick="sortTable('patronsTable', 4, 'date')" style="cursor:pointer">Membership Date ↕</th>
+                <th onclick="sortTable('patronsTable', 5)" style="cursor:pointer">Address ↕</th>
+                <th onclick="sortTable('patronsTable', 6)" style="cursor:pointer">Phone ↕</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -232,7 +233,7 @@
             let table = document.getElementById("patronsTable");
             let tr = table.getElementsByTagName("tr");
 
-            for (let i = 0; i < tr.length; i++) {
+            for (let i = 1; i < tr.length; i++) {
                 let td = tr[i].getElementsByTagName("td");
                 let visible = false;
                 for (let j = 0; j < td.length - 1; j++) {

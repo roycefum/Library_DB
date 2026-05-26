@@ -12,7 +12,19 @@ const executeQuery = async (query, params = []) => {
 
 exports.getAllEvents = async (req, res) => {
     try {
-        const results = await executeQuery('SELECT * FROM Patron_Events');
+        const results = await executeQuery(`
+            SELECT 
+                pe.eventID,
+                pe.eventName,
+                pe.event_Date,
+                pe.description,
+                pe.staffID,
+                s.first_name AS staff_first,
+                s.last_name AS staff_last
+            FROM Patron_Events pe
+            JOIN Staff s ON pe.staffID = s.staffID
+            ORDER BY pe.event_Date DESC
+        `);
         res.json(results);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -20,29 +32,20 @@ exports.getAllEvents = async (req, res) => {
 };
 
 exports.addEvent = async (req, res) => {
-    const { eventName, event_Date, description, attendance, staffID } = req.body;
-
-    // Basic validation to ensure required fields are not null
-    if (!eventName || !event_Date || !staffID || attendance === undefined) {
+    const { eventName, event_Date, description, staffID } = req.body;
+    if (!eventName || !event_Date || !staffID) {
         return res.status(400).json({ error: "Missing required fields" });
     }
-
-    // Check if the staffID exists in the Staff table
-    const staffExists = await db.pool.query('SELECT 1 FROM Staff WHERE staffID = ?', [staffID]);
-    if (staffExists[0].length === 0) {
-        return res.status(404).json({ error: "Staff ID does not exist" });
-    }
-
-    const query = 'INSERT INTO Patron_Events (eventName, event_Date, description, attendance, staffID) VALUES (?, ?, ?, ?, ?)';
     try {
-        const [result] = await db.pool.query(query, [eventName, event_Date, description, attendance, staffID]);
+        const result = await executeQuery(
+            'INSERT INTO Patron_Events (eventName, event_Date, description, staffID) VALUES (?, ?, ?, ?)',
+            [eventName, event_Date, description, staffID]
+        );
         res.json({ message: "Event added successfully!", eventId: result.insertId });
     } catch (err) {
-        console.error('Error executing addEvent query:', err.message); // Log the error message to the console
-        res.status(500).json({ error: 'Database error occurred: ' + err.message });
+        res.status(500).json({ error: err.message });
     }
 };
-
 
 exports.deleteEvent = async (req, res) => {
     const { eventID } = req.params;
@@ -60,9 +63,12 @@ exports.deleteEvent = async (req, res) => {
 
 exports.updateEvent = async (req, res) => {
     const { eventID } = req.params;
-    const { eventName, event_Date, description, attendance, staffID } = req.body;
+    const { eventName, event_Date, description, staffID } = req.body;
     try {
-        const result = await executeQuery('UPDATE Patron_Events SET eventName = ?, event_Date = ?, description = ?, attendance = ?, staffID = ? WHERE eventID = ?', [eventName, event_Date, description, attendance, staffID, eventID]);
+        const result = await executeQuery(
+            'UPDATE Patron_Events SET eventName = ?, event_Date = ?, description = ?, staffID = ? WHERE eventID = ?',
+            [eventName, event_Date, description, staffID, eventID]
+        );
         if (result.affectedRows) {
             res.json({ message: "Event updated successfully!" });
         } else {
