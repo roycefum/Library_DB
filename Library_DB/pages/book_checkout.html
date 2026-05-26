@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Book Checkout</title>
     <link rel="stylesheet" href="css/styles.css">
+    <script src="js/utils.js"></script>
 </head>
 <body>
     <header>
@@ -40,15 +41,15 @@
    <!-- Available Books -->
 <h2>Available Books</h2>
 <div class="filter-container">
-    <input type="text" id="filterInput" onkeyup="filterBooks()" placeholder="Search for books...">
+    <input type="text" id="filterInput" onkeyup="filterBooks()" placeholder="Search for books..." style="width: 600px;">
 </div>
 <table id="availableBooksTable">
     <thead>
         <tr>
-            <th>Title</th>
-            <th>Author</th>
-            <th>Genre</th>
-            <th>ISBN</th>
+            <th onclick="sortTable('availableBooksTable', 0)" style="cursor:pointer">Title ↕</th>
+            <th onclick="sortTable('availableBooksTable', 1)" style="cursor:pointer">Author ↕</th>
+            <th onclick="sortTable('availableBooksTable', 2)" style="cursor:pointer">Genre ↕</th>
+            <th onclick="sortTable('availableBooksTable', 3)" style="cursor:pointer">ISBN ↕</th>
             <th>Action</th>
         </tr>
     </thead>
@@ -142,7 +143,7 @@ function filterBooks() {
     let filter = input.value.toUpperCase();
     let table = document.getElementById("availableBooksTable");
     let tr = table.getElementsByTagName("tr");
-    for (let i = 0; i < tr.length; i++) {
+    for (let i = 1; i < tr.length; i++) {
         let td = tr[i].getElementsByTagName("td");
         let visible = false;
         for (let j = 0; j < td.length - 1; j++) {

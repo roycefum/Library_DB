@@ -8,6 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Browse Books</title>
     <link rel="stylesheet" href="css/styles.css">
+    <script src="js/utils.js"></script>
 </head>
 <body>
     <!-- Navigation header -->
@@ -36,12 +37,12 @@
     <table id="booksTable">
         <thead>
             <tr>
-                <th>Title</th>
-                <th>Author</th>
-                <th>ISBN</th>
-                <th>Published Year</th>
-                <th>Genre</th>
-                <th>Status</th>
+                <th onclick="sortTable('booksTable', 0)" style="cursor:pointer">Title ↕</th>
+                <th onclick="sortTable('booksTable', 1)" style="cursor:pointer">Author ↕</th>
+                <th onclick="sortTable('booksTable', 2)" style="cursor:pointer">ISBN ↕</th>
+                <th onclick="sortTable('booksTable', 3, 'number')" style="cursor:pointer">Published Year ↕</th>
+                <th onclick="sortTable('booksTable', 4)" style="cursor:pointer">Genre ↕</th>
+                <th onclick="sortTable('booksTable', 5)" style="cursor:pointer">Status ↕</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -206,7 +207,7 @@
             let table = document.getElementById("booksTable");
             let tr = table.getElementsByTagName("tr");
 
-            for (let i = 0; i < tr.length; i++) {
+            for (let i = 1; i < tr.length; i++) {
                 let td = tr[i].getElementsByTagName("td");
                 let visible = false;
                 for (let j = 0; j < td.length - 1; j++) {

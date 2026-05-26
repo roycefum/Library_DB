@@ -112,6 +112,7 @@
                     <td>${item.transactionDate ? item.transactionDate.split('T')[0] : ''}</td>
                     <td>${item.transactionType}</td>
                     <td>
+                        <button onclick="lookupTransaction(${item.transactionID})">Details</button>
                         <button onclick="deleteTransaction(${item.transactionID})">Delete</button>
                     </td>
                 `;
@@ -131,8 +132,8 @@
             .catch(error => console.error('Error deleting transaction:', error));
         }
 
-        function lookupTransaction() {
-            const transactionID = document.getElementById('transactionLookupInput').value;
+        function lookupTransaction(transactionID) {
+            transactionID = transactionID || document.getElementById('transactionLookupInput').value;
             if (!transactionID) {
                 alert('Please enter a Transaction ID.');
                 return;
@@ -170,6 +171,7 @@
                     });
 
                     document.getElementById('transactionCard').style.display = 'block';
+                    document.getElementById('transactionCard').scrollIntoView({ behavior: 'smooth' });
                 })
                 .catch(error => console.error('Error looking up transaction:', error));
         }

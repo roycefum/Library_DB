@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Book Check In</title>
     <link rel="stylesheet" href="css/styles.css">
+    <script src="js/utils.js"></script>
 </head>
 <body>
     <header>
@@ -36,11 +37,11 @@
     <table id="checkedOutTable">
         <thead>
             <tr>
-                <th>Title</th>
-                <th>Author</th>
-                <th>Genre</th>
-                <th>Transaction Date</th>
-                <th>Due Date</th>
+                <th onclick="sortTable('checkedOutTable', 0)" style="cursor:pointer">Title ↕</th>
+                <th onclick="sortTable('checkedOutTable', 1)" style="cursor:pointer">Author ↕</th>
+                <th onclick="sortTable('checkedOutTable', 2)" style="cursor:pointer">Genre ↕</th>
+                <th onclick="sortTable('checkedOutTable', 3, 'date')" style="cursor:pointer">Transaction Date ↕</th>
+                <th onclick="sortTable('checkedOutTable', 4, 'date')" style="cursor:pointer">Due Date ↕</th>
                 <th>Action</th>
             </tr>
         </thead>
