@@ -91,3 +91,27 @@ exports.getAttendanceByEvent = async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 };
+
+exports.getEventsByPatron = async (req, res) => {
+    const { patronID } = req.params;
+    try {
+        const results = await executeQuery(`
+            SELECT 
+                pea.eventsDetailID,
+                pe.eventID,
+                pe.eventName,
+                pe.event_Date,
+                pe.description,
+                s.first_name AS staff_first,
+                s.last_name AS staff_last
+            FROM Patron_Events_Attendance pea
+            JOIN Patron_Events pe ON pea.eventID = pe.eventID
+            JOIN Staff s ON pe.staffID = s.staffID
+            WHERE pea.patronID = ?
+            ORDER BY pe.event_Date DESC
+        `, [patronID]);
+        res.json(results);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};

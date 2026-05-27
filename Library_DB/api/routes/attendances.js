@@ -8,6 +8,7 @@ const attendancesController = require('../controllers/attendancesController');
 router.get('/', attendancesController.getAllAttendances);
 router.post('/', attendancesController.addAttendance);
 router.get('/event/:eventID', attendancesController.getAttendanceByEvent);
+router.get('/patron/:patronID', attendancesController.getEventsByPatron);
 router.delete('/:eventsDetailID', attendancesController.deleteAttendance);
 router.put('/:eventsDetailID', attendancesController.updateAttendance);
 

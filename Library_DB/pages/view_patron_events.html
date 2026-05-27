@@ -107,6 +107,30 @@
         </tbody>
     </table>
 
+    <!-- Patron Event History -->
+<h2>Patron Event History</h2>
+<div class="filter-container" style="align-items: flex-end;">
+    <div>
+        <label for="patronEventSelect">Select Patron:</label><br>
+        <select id="patronEventSelect" onchange="fetchEventsByPatron()" style="width: 300px; padding: 8px;"></select>
+    </div>
+</div>
+
+<table id="patronEventsTable">
+    <thead>
+        <tr>
+            <th onclick="sortTable('patronEventsTable', 0)" style="cursor:pointer">Event Name ↕</th>
+            <th onclick="sortTable('patronEventsTable', 1, 'date')" style="cursor:pointer">Date ↕</th>
+            <th onclick="sortTable('patronEventsTable', 2)" style="cursor:pointer">Description ↕</th>
+            <th onclick="sortTable('patronEventsTable', 3)" style="cursor:pointer">Staff ↕</th>
+            <th onclick="sortTable('patronEventsTable', 4)" style="cursor:pointer">Status ↕</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td colspan="5">Select a patron to view their event history.</td></tr>
+    </tbody>
+</table>
+
     <script>
         const API_BASE_URL = 'http://localhost:3000';
 
@@ -272,19 +296,20 @@
         // ── Attendance ───────────────────────────────────────
 
         function fetchPatrons() {
-            fetch(`${API_BASE_URL}/api/patrons`)
-                .then(response => response.json())
-                .then(patrons => {
-                    const select = document.getElementById('addAttendancePatron');
-                    select.innerHTML = '';
-                    patrons.forEach(patron => {
-                        const option = document.createElement('option');
-                        option.value = patron.patronID;
-                        option.text = `${patron.first_name} ${patron.last_name}`;
-                        select.appendChild(option);
-                    });
-                })
-                .catch(error => console.error('Error fetching patrons:', error));
+        fetch(`${API_BASE_URL}/api/patrons`)
+            .then(response => response.json())
+            .then(patrons => {
+                const select = document.getElementById('addAttendancePatron');
+                select.innerHTML = '';
+                patrons.forEach(patron => {
+                    const option = document.createElement('option');
+                    option.value = patron.patronID;
+                    option.text = `${patron.first_name} ${patron.last_name}`;
+                    select.appendChild(option);
+                });
+                populatePatronEventSelect(patrons);
+            })
+            .catch(error => console.error('Error fetching patrons:', error));
         }
 
         function fetchAttendanceByEvent() {
@@ -377,6 +402,54 @@
                 tr[i].style.display = visible ? "" : "none";
             }
         }
+
+        // ── Patron Event History ─────────────────────────────
+
+function populatePatronEventSelect(patrons) {
+    const select = document.getElementById('patronEventSelect');
+    select.innerHTML = '<option value="">-- Select a Patron --</option>';
+    patrons.forEach(patron => {
+        const option = document.createElement('option');
+        option.value = patron.patronID;
+        option.text = `${patron.first_name} ${patron.last_name}`;
+        select.appendChild(option);
+    });
+}
+
+function fetchEventsByPatron() {
+    const patronID = document.getElementById('patronEventSelect').value;
+    if (!patronID) return;
+
+    fetch(`${API_BASE_URL}/api/attendances/patron/${patronID}`)
+        .then(response => response.json())
+        .then(data => populatePatronEventsTable(data))
+        .catch(error => console.error('Error fetching patron events:', error));
+}
+
+function populatePatronEventsTable(events) {
+    const tableBody = document.getElementById('patronEventsTable').getElementsByTagName('tbody')[0];
+    tableBody.innerHTML = '';
+
+    if (events.length === 0) {
+        const row = tableBody.insertRow();
+        row.innerHTML = `<td colspan="5">This patron has no event registrations.</td>`;
+        return;
+    }
+
+    const today = new Date();
+    events.forEach(event => {
+        const row = tableBody.insertRow();
+        const eventDate = new Date(event.event_Date);
+        const isPast = eventDate < today;
+        row.innerHTML = `
+            <td>${event.eventName}</td>
+            <td>${eventDate.toLocaleDateString()}</td>
+            <td>${event.description}</td>
+            <td>${event.staff_first} ${event.staff_last}</td>
+            <td style="color: ${isPast ? 'gray' : 'green'}">${isPast ? 'Past' : 'Upcoming'}</td>
+        `;
+    });
+}
     </script>
 </body>
 </html>
