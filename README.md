@@ -8,7 +8,7 @@ A full-stack library management system for libraries and community centers. Mana
 
 - **Book Checkout** — Cart-based checkout flow, checks availability in real time
 - **Book Check In** — Pull up a patron and check in individual books, with overdue highlighting
-- **Book Inventory** — Full CRUD with availability status (Available / Checked Out)
+- **Book Inventory** — Full CRUD with availability status (Available / Checked Out) and who has each book
 - **Patron Management** — Member profiles, contact details, membership history
 - **Transaction History** — Full audit trail with transaction detail lookup
 - **Event Management** — Schedule events, manage attendance, view patron event history
@@ -53,7 +53,6 @@ mysql --version
 
 ```bash
 git clone https://github.com/roycefum/Library_DB.git
-cd Library_DB/Library_DB
 ```
 
 **Option B — Download ZIP (no Git required):**
@@ -61,7 +60,12 @@ cd Library_DB/Library_DB
 2. Click the green **Code** button
 3. Click **Download ZIP**
 4. Unzip the folder
-5. Open a terminal and navigate to the `Library_DB/Library_DB` folder inside the unzipped directory
+
+> ⚠️ **Important:** After cloning or unzipping you will have a `Library_DB` folder inside another `Library_DB` folder. Make sure you navigate into the **inner** folder before running any commands:
+> ```bash
+> cd Library_DB/Library_DB
+> ```
+> If you run commands from the outer folder, nothing will work.
 
 ---
 
@@ -71,7 +75,9 @@ cd Library_DB/Library_DB
 npm install
 ```
 
-*(Open Command Prompt or PowerShell in the project folder on Windows)*
+> ⚠️ **Don't skip this step.** The app will not run without it. Run this from inside the `Library_DB/Library_DB` folder.
+
+*(On Windows, open Command Prompt or PowerShell in the project folder)*
 
 ---
 
@@ -106,9 +112,11 @@ mysql -u root --skip-password
 MySQL on Windows is typically installed via the [MySQL Installer](https://dev.mysql.com/downloads/installer/). Once installed:
 
 1. Open **MySQL Command Line Client** from the Start Menu
-2. Enter your root password when prompted (set during installation)
+2. Enter your root password when prompted (set during installation — if you can't remember it, see [resetting MySQL root password on Windows](https://dev.mysql.com/doc/refman/8.0/en/resetting-permissions.html))
 
 Or use **MySQL Workbench** if you prefer a GUI.
+
+> **Windows tip:** If you set a root password during installation, replace `--skip-password` with `-p` in all MySQL commands below and enter your password when prompted.
 
 ---
 
@@ -140,7 +148,7 @@ mysql -u root -p read_renaissance < "SQL FILES\DDL.sql"
 Get-Content "SQL FILES\DDL.sql" | mysql -u root -p read_renaissance
 ```
 
-> If you set a root password during MySQL installation on Windows, you'll be prompted to enter it after the `-p` flag.
+> **Note:** The folder is called `SQL FILES` with a space. Make sure to include the quotes around it exactly as shown, otherwise the terminal won't find it.
 
 ---
 
@@ -156,8 +164,9 @@ DB_NAME=read_renaissance
 PORT=3000
 ```
 
+> **Important:** The `.env` file is not included in the repository for security reasons — you must create it yourself. Without it the app will not connect to the database.
+>
 > Set `DB_PASSWORD` to your MySQL root password if you have one, otherwise leave it blank.
-> The `.env` file is not included in the repository for security reasons — you must create it yourself.
 
 ---
 
@@ -199,7 +208,7 @@ http://localhost:3000/index.html
 
 ### Views
 
-- **`Books_With_Availability`** — Books table with real-time availability status derived from open transactions
+- **`Books_With_Availability`** — Books table with real-time availability status and current holder derived from open transactions
 
 ---
 
@@ -210,6 +219,7 @@ http://localhost:3000/index.html
 - **Loan period is configurable** — Stored in the `Settings` table rather than hardcoded, so it can be changed without touching code
 - **Cart-based checkout** — Books are added to an in-memory cart before a single atomic database transaction creates all records at once
 - **Normalised schema** — Transaction details are separated from transaction headers to support multi-book checkouts without duplication
+- **Availability check on checkout** — The system prevents checking out a book that already has an open transaction
 
 ---
 
@@ -248,7 +258,6 @@ Library_DB/
 ## Future Improvements
 
 - [ ] Authentication and role-based access control (patron vs. staff vs. manager)
-- [ ] Prevent checking out books that are already checked out
 - [ ] Overdue notification system
 - [ ] Renewal transaction workflow
 - [ ] API documentation (Swagger / OpenAPI)
