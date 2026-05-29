@@ -96,6 +96,20 @@ exports.checkout = async (req, res) => {
         );
         const loanPeriod = parseInt(setting[0].settingValue, 10);
 
+        // Check all books are available
+        for (const bookID of bookIDs) {
+            const openTransactions = await executeQuery(
+                'SELECT * FROM Book_Transaction_Details WHERE bookID = ? AND returnDate IS NULL',
+                [bookID]
+            );
+            if (openTransactions.length > 0) {
+                await executeQuery('ROLLBACK');
+                return res.status(400).json({ 
+                    message: `Book ID ${bookID} is already checked out.` 
+                });
+            }
+        }
+
         // Create the transaction header
         const transaction = await executeQuery(
             'INSERT INTO Book_Transactions (patronID, numberBooks, staffID, transactionDate) VALUES (?, ?, ?, ?)',

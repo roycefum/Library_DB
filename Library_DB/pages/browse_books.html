@@ -42,6 +42,7 @@
                 <th onclick="sortTable('booksTable', 3, 'number')" style="cursor:pointer">Published Year ↕</th>
                 <th onclick="sortTable('booksTable', 4)" style="cursor:pointer">Genre ↕</th>
                 <th onclick="sortTable('booksTable', 5)" style="cursor:pointer">Status ↕</th>
+                <th onclick="sortTable('booksTable', 6)" style="cursor:pointer">Checked Out By ↕</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -107,8 +108,7 @@
             tableBody.innerHTML = '';
             books.forEach(book => {
                 const row = tableBody.insertRow();
-                row.innerHTML = `<td>${book.title}</td><td>${book.author || 'N/A'}</td><td>${book.isbn}</td><td>${book.publishedYear}</td><td>${book.genre || 'N/A'}</td><td>${book.status || 'Available'}</td><td><button onclick="editBook('${book.isbn}', '${book.title}', '${book.author}', ${book.publishedYear}, '${book.genre}')">Edit</button><button onclick="deleteBook('${book.isbn}')">Delete</button></td>`;
-            });
+            row.innerHTML = `<td>${book.title}</td><td>${book.author || 'N/A'}</td><td>${book.isbn}</td><td>${book.publishedYear}</td><td>${book.genre || 'N/A'}</td><td>${book.status || 'Available'}</td><td>${book.checkedOutBy || ''}</td><td><button onclick="editBook('${book.isbn}', '${book.title}', '${book.author}', ${book.publishedYear}, '${book.genre}')">Edit</button><button onclick="deleteBook('${book.isbn}')">Delete</button></td>`;            });
         }
 
         // Populate edit form and show current book data
