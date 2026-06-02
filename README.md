@@ -65,19 +65,18 @@ mysql --version
 
 ```bash
 git clone https://github.com/roycefum/Library_DB.git
+cd Library_DB
 ```
 
 **Option B — Download ZIP (no Git required):**
 1. Go to https://github.com/roycefum/Library_DB
 2. Click the green **Code** button
 3. Click **Download ZIP**
-4. Unzip the folder
-
-> ⚠️ **Important:** After cloning or unzipping you will have a `Library_DB` folder inside another `Library_DB` folder. Make sure you navigate into the **inner** folder before running any commands:
-> ```bash
-> cd Library_DB/Library_DB
-> ```
-> If you run commands from the outer folder, nothing will work.
+4. Unzip the folder — it will be called `Library_DB-main`
+5. Navigate into it:
+```bash
+cd Library_DB-main
+```
 
 ---
 
@@ -87,7 +86,7 @@ git clone https://github.com/roycefum/Library_DB.git
 npm install
 ```
 
-> ⚠️ **Don't skip this step.** The app will not run without it. Run this from inside the `Library_DB/Library_DB` folder.
+> ⚠️ **Don't skip this step.** The app will not run without it.
 
 *(On Windows, open Command Prompt or PowerShell in the project folder)*
 
@@ -152,11 +151,13 @@ sudo mysql -u root
 
 **Step 1 — Download**
 1. Go to [dev.mysql.com/downloads/installer](https://dev.mysql.com/downloads/installer/)
-2. Download the **MySQL Installer for Windows** (the larger "Full" version is easier for beginners)
+2. Download the **smaller "web" installer** — it will download only what you need during setup
 3. Run the installer
 
 **Step 2 — Choose Setup Type**
-Select **Developer Default** or **Server Only** — either works for this project
+Select **Server Only** — this is all you need for this project
+
+> **Note:** During the installation wizard you will be presented with many configuration options. Unless you know what you are doing, leave everything as the default and just click Next. The only things you need to set are the root password in Step 7 and the service settings in Step 8.
 
 **Step 3 — Installation**
 Click **Execute** to download and install the components. Wait for all items to show a green checkmark.
@@ -165,12 +166,12 @@ Click **Execute** to download and install the components. Wait for all items to 
 Click **Next** to begin configuring MySQL Server
 
 **Step 5 — Type and Networking**
-- Config Type: **Development Computer**
-- Port: **3306** (leave as default)
+- Leave everything as default
 - Click **Next**
 
 **Step 6 — Authentication Method**
-Select **Use Strong Password Encryption** (recommended) and click **Next**
+- Leave as default
+- Click **Next**
 
 **Step 7 — Accounts and Roles (Root Password)**
 - Set a root password — **write this down**, you will need it later
@@ -178,10 +179,7 @@ Select **Use Strong Password Encryption** (recommended) and click **Next**
 - Click **Next**
 
 **Step 8 — Windows Service**
-- Configure MySQL Server as a Windows Service: **Yes** (leave checked)
-- Windows Service Name: **MySQL80** (leave as default)
-- Start the MySQL Server at System Startup: **Yes** (recommended)
-- Run Windows Service as: **Standard System Account** (leave as default)
+- Leave everything as default
 - Click **Next**
 
 **Step 9 — Apply Configuration**
@@ -198,11 +196,6 @@ MySQL should start automatically as a Windows Service. If you get connection err
 2. Find **MySQL80** in the list
 3. If status is not **Running**, right click → **Start**
 
-Or via Command Prompt (run as Administrator):
-```cmd
-net start mysql80
-```
-
 **Step 12 — Open MySQL Command Line Client**
 
 Open **MySQL Command Line Client** from the Start Menu and enter your root password. You should see the `mysql>` prompt.
@@ -216,7 +209,7 @@ Open **MySQL Command Line Client** from the Start Menu and enter your root passw
 > ⚠️ **Mac/Linux:** Run these commands in your regular terminal.
 > ⚠️ **Windows:** Run these commands inside **MySQL Command Line Client**.
 
-**Step 1 — Log into MySQL (Mac/Linux only — Windows users are already in MySQL Command Line Client)**
+**Step 1 — Log into MySQL (Mac/Linux only)**
 
 ```bash
 # If no password:
@@ -226,14 +219,14 @@ mysql -u root --skip-password
 mysql -u root -p
 ```
 
-**Step 2 — Create the database** (you are now inside MySQL, the prompt shows `mysql>`)
+**Step 2 — Create the database** (the prompt now shows `mysql>`)
 
 ```sql
 CREATE DATABASE read_renaissance;
 EXIT;
 ```
 
-**Step 3 — Import the schema** 
+**Step 3 — Import the schema**
 
 > ⚠️ You should now be back in your regular terminal (not inside MySQL). If you still see `mysql>`, type `EXIT;` and press Enter first.
 
@@ -245,16 +238,19 @@ mysql -u root --skip-password read_renaissance < SQL_FILES/DDL.sql
 **Windows — run this inside MySQL Command Line Client:**
 ```sql
 USE read_renaissance;
-SOURCE C:/Users/YourUsername/Library_DB/Library_DB/SQL_FILES/DDL.sql;
+SOURCE C:/Users/YOUR_USERNAME/Library_DB/SQL_FILES/DDL.sql;
 ```
 
-> Replace `YourUsername` with your actual Windows username and adjust the path if you saved the project in a different location. Use forward slashes `/` not backslashes `\`.
+> ⚠️ **Replace `YOUR_USERNAME` with your actual Windows username.** For example if your username is `john` the path would be:
+> `SOURCE C:/Users/john/Library_DB/SQL_FILES/DDL.sql;`
+>
+> If you saved the project somewhere other than your user folder, adjust the path accordingly. Always use forward slashes `/` not backslashes `\`.
 
 ---
 
 ### 5. Configure the Database Connection
 
-Create a `.env` file in the `Library_DB/Library_DB` folder with the following contents:
+Create a file called `.env` in the project root folder with the following contents:
 
 ```
 DB_HOST=localhost
