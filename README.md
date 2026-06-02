@@ -47,12 +47,14 @@ Before you start, make sure you have the following installed:
 
 - [Node.js](https://nodejs.org/) (v18 or higher recommended)
 - [MySQL](https://dev.mysql.com/downloads/mysql/) (v8 or higher)
+- [Git](https://git-scm.com/downloads) (strongly recommended)
 
 To verify they're installed, open a terminal and run:
 
 ```bash
 node -v
 mysql --version
+git --version
 ```
 
 ---
@@ -61,6 +63,8 @@ mysql --version
 
 ### 1. Get the Code
 
+> ✅ **We strongly recommend using Git to clone the repo.** Downloading as a ZIP creates nested folders with inconsistent naming across platforms which makes the setup more complicated.
+
 **Option A — Git (recommended):**
 
 ```bash
@@ -68,15 +72,23 @@ git clone https://github.com/roycefum/Library_DB.git
 cd Library_DB
 ```
 
-**Option B — Download ZIP (no Git required):**
-1. Go to https://github.com/roycefum/Library_DB
-2. Click the green **Code** button
-3. Click **Download ZIP**
-4. Unzip the folder — it will be called `Library_DB-main`
-5. Navigate into it:
+**Option B — Download ZIP (not recommended — only use if you cannot install Git):**
+
+Downloading as a ZIP creates a nested folder structure that varies by platform. After unzipping:
+
+- On **Mac/Linux** the folder will be `Library_DB-main` containing another `Library_DB-main` folder
+- On **Windows** the same applies
+
+Navigate into the inner folder:
 ```bash
-cd Library_DB-main
+# Mac/Linux
+cd Library_DB-main/Library_DB-main
+
+# Windows (Command Prompt)
+cd Library_DB-main\Library_DB-main
 ```
+
+You will need to adjust any paths in the setup steps below to match this structure.
 
 ---
 
@@ -151,27 +163,25 @@ sudo mysql -u root
 
 **Step 1 — Download**
 1. Go to [dev.mysql.com/downloads/installer](https://dev.mysql.com/downloads/installer/)
-2. Download the **smaller "web" installer** — it will download only what you need during setup
+2. Download the **smaller "web" installer**
 3. Run the installer
 
 **Step 2 — Choose Setup Type**
-Select **Server Only** — this is all you need for this project
+Select **Server Only**
 
-> **Note:** During the installation wizard you will be presented with many configuration options. Unless you know what you are doing, leave everything as the default and just click Next. The only things you need to set are the root password in Step 7 and the service settings in Step 8.
+> **Note:** During the installation wizard leave everything as the default and just click Next. The only things you need to set are the root password in Step 7 and the service settings in Step 8.
 
 **Step 3 — Installation**
-Click **Execute** to download and install the components. Wait for all items to show a green checkmark.
+Click **Execute** and wait for all items to show a green checkmark.
 
 **Step 4 — Product Configuration**
-Click **Next** to begin configuring MySQL Server
+Click **Next**
 
 **Step 5 — Type and Networking**
-- Leave everything as default
-- Click **Next**
+Leave everything as default and click **Next**
 
 **Step 6 — Authentication Method**
-- Leave as default
-- Click **Next**
+Leave as default and click **Next**
 
 **Step 7 — Accounts and Roles (Root Password)**
 - Set a root password — **write this down**, you will need it later
@@ -179,18 +189,17 @@ Click **Next** to begin configuring MySQL Server
 - Click **Next**
 
 **Step 8 — Windows Service**
-- Leave everything as default
-- Click **Next**
+Leave everything as default and click **Next**
 
 **Step 9 — Apply Configuration**
-Click **Execute** and wait for all steps to complete with green checkmarks, then click **Finish**
+Click **Execute**, wait for green checkmarks, then click **Finish**
 
 **Step 10 — Complete the Wizard**
-Click through any remaining screens and click **Finish**
+Click through remaining screens and click **Finish**
 
 **Step 11 — Verify MySQL is Running**
 
-MySQL should start automatically as a Windows Service. If you get connection errors:
+MySQL should start automatically. If you get connection errors:
 
 1. Press **Windows + R**, type `services.msc`, hit Enter
 2. Find **MySQL80** in the list
@@ -236,15 +245,21 @@ mysql -u root --skip-password read_renaissance < SQL_FILES/DDL.sql
 ```
 
 **Windows — run this inside MySQL Command Line Client:**
+
 ```sql
 USE read_renaissance;
 SOURCE C:/Users/YOUR_USERNAME/Library_DB/SQL_FILES/DDL.sql;
 ```
 
-> ⚠️ **Replace `YOUR_USERNAME` with your actual Windows username.** For example if your username is `john` the path would be:
-> `SOURCE C:/Users/john/Library_DB/SQL_FILES/DDL.sql;`
+> ⚠️ **Replace `YOUR_USERNAME` with your actual Windows username.**
 >
-> If you saved the project somewhere other than your user folder, adjust the path accordingly. Always use forward slashes `/` not backslashes `\`.
+> For example if your Windows username is `john`:
+> ```sql
+> SOURCE C:/Users/john/Library_DB/SQL_FILES/DDL.sql;
+> ```
+>
+> If you downloaded the ZIP instead of using Git, your path will be different — this is one of the reasons we recommend using Git.
+> Always use forward slashes `/` not backslashes `\`.
 
 ---
 
