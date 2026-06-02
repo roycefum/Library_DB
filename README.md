@@ -4,6 +4,18 @@ A full-stack library management system for libraries and community centers. Mana
 
 ---
 
+## Table of Contents
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Prerequisites](#prerequisites)
+- [Getting Started](#getting-started)
+- [Database Schema](#database-schema)
+- [Design Decisions](#design-decisions)
+- [Project Structure](#project-structure)
+- [Future Improvements](#future-improvements)
+
+---
+
 ## Features
 
 - **Book Checkout** — Cart-based checkout flow, checks availability in real time
@@ -83,76 +95,164 @@ npm install
 
 ### 3. Set Up MySQL
 
+Jump to your OS:
+- [Mac](#mac)
+- [Linux](#linux)
+- [Windows](#windows)
+
+---
+
 #### Mac
 
-Start MySQL:
+If you don't have Homebrew installed, get it first:
 ```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+
+Install and start MySQL:
+```bash
+brew install mysql
 brew services start mysql
 ```
 
-Log in:
+Run the secure installation (optionally sets a root password):
 ```bash
-mysql -u root --skip-password
+mysql_secure_installation
 ```
+
+Follow the prompts. If you skip setting a password, use `--skip-password` in all MySQL commands. If you set one, use `-p` instead and enter it when prompted.
+
+Log in to verify it works:
+```bash
+# If no password:
+mysql -u root --skip-password
+
+# If you set a password:
+mysql -u root -p
+```
+
+---
 
 #### Linux
 
-Start MySQL:
+Install and start MySQL:
 ```bash
+sudo apt-get install mysql-server
 sudo service mysql start
 ```
 
 Log in:
 ```bash
-mysql -u root --skip-password
+sudo mysql -u root
 ```
-
-#### Windows
-
-MySQL on Windows is typically installed via the [MySQL Installer](https://dev.mysql.com/downloads/installer/). Once installed:
-
-1. Open **MySQL Command Line Client** from the Start Menu
-2. Enter your root password when prompted (set during installation — if you can't remember it, see [resetting MySQL root password on Windows](https://dev.mysql.com/doc/refman/8.0/en/resetting-permissions.html))
-
-Or use **MySQL Workbench** if you prefer a GUI.
-
-> **Windows tip:** If you set a root password during installation, replace `--skip-password` with `-p` in all MySQL commands below and enter your password when prompted.
 
 ---
 
-### 4. Create the Database
+#### Windows
 
-Run these commands inside the MySQL prompt:
+**Step 1 — Download**
+1. Go to [dev.mysql.com/downloads/installer](https://dev.mysql.com/downloads/installer/)
+2. Download the **MySQL Installer for Windows** (the larger "Full" version is easier for beginners)
+3. Run the installer
+
+**Step 2 — Choose Setup Type**
+Select **Developer Default** or **Server Only** — either works for this project
+
+**Step 3 — Installation**
+Click **Execute** to download and install the components. Wait for all items to show a green checkmark.
+
+**Step 4 — Product Configuration**
+Click **Next** to begin configuring MySQL Server
+
+**Step 5 — Type and Networking**
+- Config Type: **Development Computer**
+- Port: **3306** (leave as default)
+- Click **Next**
+
+**Step 6 — Authentication Method**
+Select **Use Strong Password Encryption** (recommended) and click **Next**
+
+**Step 7 — Accounts and Roles (Root Password)**
+- Set a root password — **write this down**, you will need it later
+- Leave the user accounts section empty
+- Click **Next**
+
+**Step 8 — Windows Service**
+- Configure MySQL Server as a Windows Service: **Yes** (leave checked)
+- Windows Service Name: **MySQL80** (leave as default)
+- Start the MySQL Server at System Startup: **Yes** (recommended)
+- Run Windows Service as: **Standard System Account** (leave as default)
+- Click **Next**
+
+**Step 9 — Apply Configuration**
+Click **Execute** and wait for all steps to complete with green checkmarks, then click **Finish**
+
+**Step 10 — Complete the Wizard**
+Click through any remaining screens and click **Finish**
+
+**Step 11 — Verify MySQL is Running**
+
+MySQL should start automatically as a Windows Service. If you get connection errors:
+
+1. Press **Windows + R**, type `services.msc`, hit Enter
+2. Find **MySQL80** in the list
+3. If status is not **Running**, right click → **Start**
+
+Or via Command Prompt (run as Administrator):
+```cmd
+net start mysql80
+```
+
+**Step 12 — Open MySQL Command Line Client**
+
+Open **MySQL Command Line Client** from the Start Menu and enter your root password. You should see the `mysql>` prompt.
+
+> **Note:** All MySQL commands for Windows in this README are run inside MySQL Command Line Client, not PowerShell or Command Prompt.
+
+---
+
+### 4. Create the Database and Import Schema
+
+> ⚠️ **Mac/Linux:** Run these commands in your regular terminal.
+> ⚠️ **Windows:** Run these commands inside **MySQL Command Line Client**.
+
+**Step 1 — Log into MySQL (Mac/Linux only — Windows users are already in MySQL Command Line Client)**
+
+```bash
+# If no password:
+mysql -u root --skip-password
+
+# If you set a password:
+mysql -u root -p
+```
+
+**Step 2 — Create the database** (you are now inside MySQL, the prompt shows `mysql>`)
 
 ```sql
 CREATE DATABASE read_renaissance;
 EXIT;
 ```
 
----
+**Step 3 — Import the schema** 
 
-### 5. Import the Schema and Seed Data
+> ⚠️ You should now be back in your regular terminal (not inside MySQL). If you still see `mysql>`, type `EXIT;` and press Enter first.
 
 **Mac / Linux:**
 ```bash
-mysql -u root --skip-password read_renaissance < "SQL FILES/DDL.sql"
+mysql -u root --skip-password read_renaissance < SQL_FILES/DDL.sql
 ```
 
-**Windows (Command Prompt):**
-```cmd
-mysql -u root -p read_renaissance < "SQL FILES\DDL.sql"
+**Windows — run this inside MySQL Command Line Client:**
+```sql
+USE read_renaissance;
+SOURCE C:/Users/YourUsername/Library_DB/Library_DB/SQL_FILES/DDL.sql;
 ```
 
-**Windows (PowerShell):**
-```powershell
-Get-Content "SQL FILES\DDL.sql" | mysql -u root -p read_renaissance
-```
-
-> **Note:** The folder is called `SQL FILES` with a space. Make sure to include the quotes around it exactly as shown, otherwise the terminal won't find it.
+> Replace `YourUsername` with your actual Windows username and adjust the path if you saved the project in a different location. Use forward slashes `/` not backslashes `\`.
 
 ---
 
-### 6. Configure the Database Connection
+### 5. Configure the Database Connection
 
 Create a `.env` file in the `Library_DB/Library_DB` folder with the following contents:
 
@@ -170,7 +270,7 @@ PORT=3000
 
 ---
 
-### 7. Start the Server
+### 6. Start the Server
 
 ```bash
 node app.js
@@ -183,7 +283,7 @@ Server running on http://localhost:3000
 
 ---
 
-### 8. Open the App
+### 7. Open the App
 
 Open your browser and go to:
 
@@ -249,7 +349,7 @@ Library_DB/
 │   └── helpers/
 │       └── database/
 │           └── db-connector.js
-└── SQL FILES/
+└── SQL_FILES/
     └── DDL.sql               # Schema and seed data
 ```
 
