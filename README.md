@@ -2,6 +2,8 @@
 
 A full-stack library management system for libraries and community centers. Manage book checkouts and returns, patron memberships, staff, and events — all through a clean web interface.
 
+> ⏱️ **Estimated setup time: 10-20 minutes**
+
 ---
 
 ## Table of Contents
@@ -94,7 +96,9 @@ mysql -u root --skip-password read_renaissance < SQL_FILES/DDL.sql
 ```
 > If you set a root password, replace `--skip-password` with `-p` and enter your password when prompted.
 
-**7. Create the `.env` file** in the project root:
+**7. Create the `.env` file:**
+
+Open the project in VS Code, create a new file called `.env` in the root folder and paste:
 ```
 DB_HOST=localhost
 DB_USER=root
@@ -103,6 +107,11 @@ DB_NAME=read_renaissance
 PORT=3000
 ```
 > Set `DB_PASSWORD` to your MySQL root password if you set one, otherwise leave it blank.
+
+Or create it from the terminal:
+```bash
+printf "DB_HOST=localhost\nDB_USER=root\nDB_PASSWORD=\nDB_NAME=read_renaissance\nPORT=3000" > .env
+```
 
 **8. Start the server:**
 ```bash
@@ -141,13 +150,20 @@ sudo mysql -u root -e "CREATE DATABASE read_renaissance;"
 sudo mysql -u root read_renaissance < SQL_FILES/DDL.sql
 ```
 
-**5. Create the `.env` file** in the project root:
+**5. Create the `.env` file:**
+
+Open the project in VS Code, create a new file called `.env` in the root folder and paste:
 ```
 DB_HOST=localhost
 DB_USER=root
 DB_PASSWORD=
 DB_NAME=read_renaissance
 PORT=3000
+```
+
+Or create it from the terminal:
+```bash
+printf "DB_HOST=localhost\nDB_USER=root\nDB_PASSWORD=\nDB_NAME=read_renaissance\nPORT=3000" > .env
 ```
 
 **6. Start the server:**
@@ -165,6 +181,8 @@ http://localhost:3000/index.html
 ### Windows
 
 > ⚠️ Use **Command Prompt** for all commands below. PowerShell does not support the `<` operator needed for importing SQL files.
+
+> ⚠️ Every MySQL command will prompt for your password. If you mistype it you will not see an error — the command will just silently fail. If something isn't working, re-run the command and carefully retype your password.
 
 **1. Install prerequisites:**
 - [Git for Windows](https://git-scm.com/download/win) — use default settings
@@ -196,8 +214,12 @@ mysql --version
 **5. Clone the repo:**
 ```cmd
 git clone https://github.com/roycefum/Library_DB.git
+```
+Then navigate into the project folder:
+```cmd
 cd Library_DB
 ```
+> After cloning, Command Prompt may return to your home directory. If so, run `cd Library_DB` to navigate into the project folder before continuing.
 
 **6. Install dependencies:**
 ```cmd
@@ -205,21 +227,45 @@ npm install
 ```
 
 **7. Create the database and import schema:**
+
+First create the database:
 ```cmd
 mysql -u root -p -e "DROP DATABASE IF EXISTS read_renaissance; CREATE DATABASE read_renaissance;"
+```
+Enter your root password when prompted. Then import the schema:
+```cmd
 mysql -u root -p read_renaissance < "SQL_FILES\DDL.sql"
 ```
-Enter your root password when prompted.
+Enter your root password again when prompted. No output means it worked.
 
-**8. Create the `.env` file** in the project root using Command Prompt:
+**8. Create the `.env` file:**
+
+Copy and paste each line below into Command Prompt one at a time, pressing Enter after each one. No output after each line is normal and means it worked. When you reach the password line, replace `yourpassword` with your actual MySQL root password before pressing Enter:
+
 ```cmd
 echo DB_HOST=localhost> .env
+```
+```cmd
 echo DB_USER=root>> .env
+```
+```cmd
 echo DB_PASSWORD=yourpassword>> .env
+```
+```cmd
 echo DB_NAME=read_renaissance>> .env
+```
+```cmd
 echo PORT=3000>> .env
 ```
-Replace `yourpassword` with your MySQL root password.
+
+> If you have VS Code installed, an easier option is to open the project folder in VS Code, create a new file called `.env` and paste the following — replacing `yourpassword` with your MySQL root password:
+> ```
+> DB_HOST=localhost
+> DB_USER=root
+> DB_PASSWORD=yourpassword
+> DB_NAME=read_renaissance
+> PORT=3000
+> ```
 
 **9. Start the server:**
 ```cmd
@@ -240,7 +286,7 @@ http://localhost:3000/index.html
 | `Patrons` | Library member records |
 | `Books` | Book inventory |
 | `Book_Transactions` | Checkout/checkin transaction headers |
-| `Book_Transaction_Details` | Per-book details for each transaction (due date, return date) |
+| `Book_Transaction_Details` — Per-book details for each transaction (due date, return date) |
 | `Staff` | Staff records and roles |
 | `Patron_Events` | Library event definitions |
 | `Patron_Events_Attendance` | Junction table linking patrons to events |
@@ -256,7 +302,7 @@ http://localhost:3000/index.html
 
 - **Availability is derived, not stored** — Book status is calculated from open transactions via a SQL view, eliminating data redundancy
 - **Transactions are immutable** — Once created, transactions can only be deleted, not edited, to preserve data integrity
-- **Loan period is configurable** — Stored in the `Settings` table rather than hardcoded, so it can be changed without touching code
+- **Loan period is configurable** — Stored in the Settings table rather than hardcoded, so it can be changed without touching code
 - **Cart-based checkout** — Books are added to an in-memory cart before a single atomic database transaction creates all records at once
 - **Normalised schema** — Transaction details are separated from transaction headers to support multi-book checkouts without duplication
 - **Availability check on checkout** — The system prevents checking out a book that already has an open transaction
