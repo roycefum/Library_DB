@@ -118,7 +118,7 @@ function fetchAvailableBooks() {
         .then(response => response.json())
         .then(books => {
             const available = books.filter(book => book.status === 'Available');
-            populateBooksTable(available);
+            window.availableBooks = available;
         })
         .catch(error => console.error('Error fetching books:', error));
 }
@@ -140,18 +140,18 @@ function populateBooksTable(books) {
 function filterBooks() {
     let input = document.getElementById("filterInput");
     let filter = input.value.toUpperCase();
-    let table = document.getElementById("availableBooksTable");
-    let tr = table.getElementsByTagName("tr");
-    for (let i = 1; i < tr.length; i++) {
-        let td = tr[i].getElementsByTagName("td");
-        let visible = false;
-        for (let j = 0; j < td.length - 1; j++) {
-            if (td[j] && td[j].textContent.toUpperCase().indexOf(filter) > -1) {
-                visible = true;
-            }
-        }
-        tr[i].style.display = visible ? "" : "none";
+    
+    if (filter.length < 2) {
+        document.getElementById('availableBooksTable').getElementsByTagName('tbody')[0].innerHTML = '';
+        return;
     }
+    
+    const filtered = window.availableBooks.filter(book => 
+        Object.values(book).some(val => 
+            String(val).toUpperCase().includes(filter)
+        )
+    );
+    populateBooksTable(filtered);
 }
 
 function addToCart(bookID, title,author,genre,publishedYear) {
