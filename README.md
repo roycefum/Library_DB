@@ -43,68 +43,13 @@ A full-stack library management system for libraries and community centers. Mana
 
 ## Prerequisites
 
-Before you start, make sure you have the following installed:
-
-- [Node.js](https://nodejs.org/) (v18 or higher recommended)
-- [MySQL](https://dev.mysql.com/downloads/mysql/) (v8 or higher)
-- [Git](https://git-scm.com/downloads) (strongly recommended)
-
-To verify they're installed, open a terminal and run:
-
-```bash
-node -v
-mysql --version
-git --version
-```
+- [Git](https://git-scm.com/downloads)
+- [Node.js](https://nodejs.org/) (v18 or higher)
+- [MySQL 8.0](https://dev.mysql.com/downloads/mysql/)
 
 ---
 
 ## Getting Started
-
-### 1. Get the Code
-
-> ✅ **We strongly recommend using Git to clone the repo.** Downloading as a ZIP creates nested folders with inconsistent naming across platforms which makes the setup more complicated.
-
-**Option A — Git (recommended):**
-
-```bash
-git clone https://github.com/roycefum/Library_DB.git
-cd Library_DB
-```
-
-**Option B — Download ZIP (not recommended — only use if you cannot install Git):**
-
-Downloading as a ZIP creates a nested folder structure that varies by platform. After unzipping:
-
-- On **Mac/Linux** the folder will be `Library_DB-main` containing another `Library_DB-main` folder
-- On **Windows** the same applies
-
-Navigate into the inner folder:
-```bash
-# Mac/Linux
-cd Library_DB-main/Library_DB-main
-
-# Windows (Command Prompt)
-cd Library_DB-main\Library_DB-main
-```
-
-You will need to adjust any paths in the setup steps below to match this structure.
-
----
-
-### 2. Install Dependencies
-
-```bash
-npm install
-```
-
-> ⚠️ **Don't skip this step.** The app will not run without it.
-
-*(On Windows, open Command Prompt or PowerShell in the project folder)*
-
----
-
-### 3. Set Up MySQL
 
 Jump to your OS:
 - [Mac](#mac)
@@ -113,160 +58,90 @@ Jump to your OS:
 
 ---
 
-#### Mac
+### Mac
 
-If you don't have Homebrew installed, get it first:
+**1. Install Homebrew (if not already installed):**
 ```bash
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
 
-Install and start MySQL:
+**2. Install MySQL:**
 ```bash
 brew install mysql
 brew services start mysql
 ```
 
-Run the secure installation (optionally sets a root password):
+**3. Secure MySQL (optionally set a root password):**
 ```bash
 mysql_secure_installation
 ```
 
-Follow the prompts. If you skip setting a password, use `--skip-password` in all MySQL commands. If you set one, use `-p` instead and enter it when prompted.
-
-Log in to verify it works:
+**4. Clone the repo:**
 ```bash
-# If no password:
-mysql -u root --skip-password
+git clone https://github.com/roycefum/Library_DB.git
+cd Library_DB
+```
 
-# If you set a password:
-mysql -u root -p
+**5. Install dependencies:**
+```bash
+npm install
+```
+
+**6. Create the database and import schema:**
+```bash
+mysql -u root --skip-password -e "CREATE DATABASE read_renaissance;"
+mysql -u root --skip-password read_renaissance < SQL_FILES/DDL.sql
+```
+> If you set a root password, replace `--skip-password` with `-p` and enter your password when prompted.
+
+**7. Create the `.env` file** in the project root:
+```
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=
+DB_NAME=read_renaissance
+PORT=3000
+```
+> Set `DB_PASSWORD` to your MySQL root password if you set one, otherwise leave it blank.
+
+**8. Start the server:**
+```bash
+node app.js
+```
+
+**9. Open the app:**
+```
+http://localhost:3000/index.html
 ```
 
 ---
 
-#### Linux
+### Linux
 
-Install and start MySQL:
+**1. Install MySQL:**
 ```bash
 sudo apt-get install mysql-server
 sudo service mysql start
 ```
 
-Log in:
+**2. Clone the repo:**
 ```bash
-sudo mysql -u root
+git clone https://github.com/roycefum/Library_DB.git
+cd Library_DB
 ```
 
----
-
-#### Windows
-
-**Step 1 — Download**
-1. Go to [dev.mysql.com/downloads/installer](https://dev.mysql.com/downloads/installer/)
-2. Download the **smaller "web" installer**
-3. Run the installer
-
-**Step 2 — Choose Setup Type**
-Select **Server Only**
-
-> **Note:** During the installation wizard leave everything as the default and just click Next. The only things you need to set are the root password in Step 7 and the service settings in Step 8.
-
-**Step 3 — Installation**
-Click **Execute** and wait for all items to show a green checkmark.
-
-**Step 4 — Product Configuration**
-Click **Next**
-
-**Step 5 — Type and Networking**
-Leave everything as default and click **Next**
-
-**Step 6 — Authentication Method**
-Leave as default and click **Next**
-
-**Step 7 — Accounts and Roles (Root Password)**
-- Set a root password — **write this down**, you will need it later
-- Leave the user accounts section empty
-- Click **Next**
-
-**Step 8 — Windows Service**
-Leave everything as default and click **Next**
-
-**Step 9 — Apply Configuration**
-Click **Execute**, wait for green checkmarks, then click **Finish**
-
-**Step 10 — Complete the Wizard**
-Click through remaining screens and click **Finish**
-
-**Step 11 — Verify MySQL is Running**
-
-MySQL should start automatically. If you get connection errors:
-
-1. Press **Windows + R**, type `services.msc`, hit Enter
-2. Find **MySQL80** in the list
-3. If status is not **Running**, right click → **Start**
-
-**Step 12 — Open MySQL Command Line Client**
-
-Open **MySQL Command Line Client** from the Start Menu and enter your root password. You should see the `mysql>` prompt.
-
-> **Note:** All MySQL commands for Windows in this README are run inside MySQL Command Line Client, not PowerShell or Command Prompt.
-
----
-
-### 4. Create the Database and Import Schema
-
-> ⚠️ **Mac/Linux:** Run these commands in your regular terminal.
-> ⚠️ **Windows:** Run these commands inside **MySQL Command Line Client**.
-
-**Step 1 — Log into MySQL (Mac/Linux only)**
-
+**3. Install dependencies:**
 ```bash
-# If no password:
-mysql -u root --skip-password
-
-# If you set a password:
-mysql -u root -p
+npm install
 ```
 
-**Step 2 — Create the database** (the prompt now shows `mysql>`)
-
-```sql
-CREATE DATABASE read_renaissance;
-EXIT;
-```
-
-**Step 3 — Import the schema**
-
-> ⚠️ You should now be back in your regular terminal (not inside MySQL). If you still see `mysql>`, type `EXIT;` and press Enter first.
-
-**Mac / Linux:**
+**4. Create the database and import schema:**
 ```bash
-mysql -u root --skip-password read_renaissance < SQL_FILES/DDL.sql
+sudo mysql -u root -e "CREATE DATABASE read_renaissance;"
+sudo mysql -u root read_renaissance < SQL_FILES/DDL.sql
 ```
 
-**Windows — run this inside MySQL Command Line Client:**
-
-```sql
-USE read_renaissance;
-SOURCE C:/Users/YOUR_USERNAME/Library_DB/SQL_FILES/DDL.sql;
-```
-
-> ⚠️ **Replace `YOUR_USERNAME` with your actual Windows username.**
->
-> For example if your Windows username is `john`:
-> ```sql
-> SOURCE C:/Users/john/Library_DB/SQL_FILES/DDL.sql;
-> ```
->
-> If you downloaded the ZIP instead of using Git, your path will be different — this is one of the reasons we recommend using Git.
-> Always use forward slashes `/` not backslashes `\`.
-
----
-
-### 5. Configure the Database Connection
-
-Create a file called `.env` in the project root folder with the following contents:
-
+**5. Create the `.env` file** in the project root:
 ```
 DB_HOST=localhost
 DB_USER=root
@@ -275,29 +150,83 @@ DB_NAME=read_renaissance
 PORT=3000
 ```
 
-> **Important:** The `.env` file is not included in the repository for security reasons — you must create it yourself. Without it the app will not connect to the database.
->
-> Set `DB_PASSWORD` to your MySQL root password if you have one, otherwise leave it blank.
-
----
-
-### 6. Start the Server
-
+**6. Start the server:**
 ```bash
 node app.js
 ```
 
-You should see:
+**7. Open the app:**
 ```
-Server running on http://localhost:3000
+http://localhost:3000/index.html
 ```
 
 ---
 
-### 7. Open the App
+### Windows
 
-Open your browser and go to:
+> ⚠️ Use **Command Prompt** for all commands below. PowerShell does not support the `<` operator needed for importing SQL files.
 
+**1. Install prerequisites:**
+- [Git for Windows](https://git-scm.com/download/win) — use default settings
+- [Node.js](https://nodejs.org/) — use default settings
+- [MySQL 8.0 MSI Installer](https://dev.mysql.com/downloads/mysql/) — download the Windows MSI Installer
+
+**2. Install MySQL 8.0:**
+1. Run the installer and choose **Server Only**
+2. Click through the configuration wizard leaving everything as default
+3. When prompted set a root password — **write it down**
+4. Complete the installation
+
+**3. Add MySQL to PATH:**
+
+Open Command Prompt and run:
+```cmd
+setx PATH "%PATH%;C:\Program Files\MySQL\MySQL Server 8.0\bin"
+```
+Close and reopen Command Prompt. Verify with:
+```cmd
+mysql --version
+```
+
+**4. Start MySQL Service:**
+1. Press **Windows + R**, type `services.msc`, hit Enter
+2. Find **MySQL80** in the list
+3. If status is blank or stopped, right click → **Start**
+
+**5. Clone the repo:**
+```cmd
+git clone https://github.com/roycefum/Library_DB.git
+cd Library_DB
+```
+
+**6. Install dependencies:**
+```cmd
+npm install
+```
+
+**7. Create the database and import schema:**
+```cmd
+mysql -u root -p -e "DROP DATABASE IF EXISTS read_renaissance; CREATE DATABASE read_renaissance;"
+mysql -u root -p read_renaissance < "SQL_FILES\DDL.sql"
+```
+Enter your root password when prompted.
+
+**8. Create the `.env` file** in the project root using Command Prompt:
+```cmd
+echo DB_HOST=localhost> .env
+echo DB_USER=root>> .env
+echo DB_PASSWORD=yourpassword>> .env
+echo DB_NAME=read_renaissance>> .env
+echo PORT=3000>> .env
+```
+Replace `yourpassword` with your MySQL root password.
+
+**9. Start the server:**
+```cmd
+node app.js
+```
+
+**10. Open the app:**
 ```
 http://localhost:3000/index.html
 ```
