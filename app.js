@@ -21,7 +21,7 @@ const bt_detailsRoutes = require('./api/routes/bt_details');
 
 // PORT SETUP
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // Middleware to enable CORS and JSON body parsing
 app.use(cors());
