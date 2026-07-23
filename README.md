@@ -2,12 +2,21 @@
 
 A full-stack library management system for libraries and community centers. Manage book checkouts and returns, patron memberships, staff, and events — all through a clean web interface.
 
-> ⏱️ **Estimated setup time: 10-20 minutes**
+---
+
+## 🌐 Live Demo
+
+Try it right now, no setup required: **[librarydb-production-7024.up.railway.app](https://librarydb-production-7024.up.railway.app)**
+
+- Browsing, checkout/check-in, and adding/editing records (books, patrons, staff, events) are all open — feel free to click around and try things out.
+- **Delete actions are password-protected** to keep the shared demo data intact. You'll be prompted for an admin key if you try to delete something — that's expected, not a bug.
 
 ---
 
 ## Table of Contents
+- [Live Demo](#-live-demo)
 - [Features](#features)
+- [Running It Locally](#running-it-locally)
 - [Tech Stack](#tech-stack)
 - [Prerequisites](#prerequisites)
 - [Getting Started](#getting-started)
@@ -30,6 +39,12 @@ A full-stack library management system for libraries and community centers. Mana
 - **Configurable Loan Period** — Set loan duration via the Settings table
 
 ---
+
+## Running It Locally
+
+Prefer to run it on your own machine instead of using the live demo? Follow the setup steps below.
+
+> ⏱️ **Estimated setup time: 10-20 minutes**
 
 ## Tech Stack
 
@@ -332,6 +347,8 @@ Library_DB/
 ├── api/
 │   ├── routes/               # Express route definitions
 │   ├── controllers/          # Business logic and database queries
+│   ├── middleware/
+│   │   └── requireAdmin.js   # Shared-secret gate for delete endpoints
 │   └── helpers/
 │       └── database/
 │           └── db-connector.js
@@ -343,7 +360,8 @@ Library_DB/
 
 ## Future Improvements
 
-- [ ] Authentication and role-based access control (patron vs. staff vs. manager)
+- [x] Basic write protection — delete endpoints are gated behind a shared admin key (`api/middleware/requireAdmin.js`)
+- [ ] Full authentication and role-based access control (patron vs. staff vs. manager)
 - [ ] Overdue notification system
 - [ ] Renewal transaction workflow
 - [ ] API documentation (Swagger / OpenAPI)
