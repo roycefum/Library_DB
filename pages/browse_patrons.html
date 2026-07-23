@@ -95,6 +95,15 @@
     <script>
         const API_BASE_URL = '';
 
+        function getAdminKey() {
+            let key = sessionStorage.getItem('adminKey');
+            if (!key) {
+                key = prompt('Enter admin key to make changes:');
+                if (key) sessionStorage.setItem('adminKey', key);
+            }
+            return key || '';
+        }
+
         // Load patron data when the document is fully loaded
         document.addEventListener("DOMContentLoaded", function() {
             fetchPatrons();
@@ -215,14 +224,22 @@
         // Deletes a patron from the database and refreshes the table
         function deletePatron(patronID) {
             fetch(`${API_BASE_URL}/api/patrons/${patronID}`, {
-                method: 'DELETE'
+                method: 'DELETE',
+                headers: { 'x-admin-key': getAdminKey() }
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) throw new Error('Unauthorized or request failed');
+                return response.json();
+            })
             .then(data => {
                 alert('Patron deleted successfully!');
                 fetchPatrons();
             })
-            .catch(error => console.error('Error deleting patron:', error));
+            .catch(error => {
+                console.error('Error deleting patron:', error);
+                alert('Failed to delete patron — check your admin key.');
+                sessionStorage.removeItem('adminKey');
+            });
         }
 
         // Filters the patron table based on input in the search box

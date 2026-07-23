@@ -4,10 +4,11 @@
 const express = require('express');
 const router = express.Router();
 const booksController = require('../controllers/booksController');
+const requireAdmin = require('../middleware/requireAdmin');
 
 router.get('/', booksController.getAllBooks);
 router.post('/', booksController.addBook);
 router.put('/:isbn', booksController.updateBook);
-router.delete('/:isbn', booksController.deleteBook);
+router.delete('/:isbn', requireAdmin, booksController.deleteBook);
 
 module.exports = router;

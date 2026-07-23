@@ -4,10 +4,11 @@
 const express = require('express');
 const router = express.Router();
 const eventsController = require('../controllers/eventsController');
+const requireAdmin = require('../middleware/requireAdmin');
 
 router.get('/', eventsController.getAllEvents);
 router.post('/', eventsController.addEvent);
-router.delete('/:eventID', eventsController.deleteEvent);
+router.delete('/:eventID', requireAdmin, eventsController.deleteEvent);
 router.put('/:eventID', eventsController.updateEvent);
 
 module.exports = router;

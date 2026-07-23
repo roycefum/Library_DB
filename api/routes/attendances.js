@@ -4,12 +4,13 @@
 const express = require('express');
 const router = express.Router();
 const attendancesController = require('../controllers/attendancesController');
+const requireAdmin = require('../middleware/requireAdmin');
 
 router.get('/', attendancesController.getAllAttendances);
 router.post('/', attendancesController.addAttendance);
 router.get('/event/:eventID', attendancesController.getAttendanceByEvent);
 router.get('/patron/:patronID', attendancesController.getEventsByPatron);
-router.delete('/:eventsDetailID', attendancesController.deleteAttendance);
+router.delete('/:eventsDetailID', requireAdmin, attendancesController.deleteAttendance);
 router.put('/:eventsDetailID', attendancesController.updateAttendance);
 
 

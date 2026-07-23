@@ -82,6 +82,15 @@
     <script>
         const API_BASE_URL = '';
 
+        function getAdminKey() {
+            let key = sessionStorage.getItem('adminKey');
+            if (!key) {
+                key = prompt('Enter admin key to make changes:');
+                if (key) sessionStorage.setItem('adminKey', key);
+            }
+            return key || '';
+        }
+
         document.addEventListener("DOMContentLoaded", function() {
             fetchStaff();
         });
@@ -133,13 +142,19 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ firstName, lastName, position })
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) throw new Error('Request failed');
+                return response.json();
+            })
             .then(data => {
                 alert('Staff member added successfully!');
                 fetchStaff();
                 form.reset();
             })
-            .catch(error => console.error('Error adding staff member:', error));
+            .catch(error => {
+                console.error('Error adding staff member:', error);
+                alert('Failed to add staff member.');
+            });
         }
 
         // Updates an existing staff member
@@ -160,7 +175,10 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ firstName, lastName, position })
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) throw new Error('Request failed');
+                return response.json();
+            })
             .then(data => {
                 alert('Staff updated successfully!');
                 fetchStaff();
@@ -186,16 +204,21 @@
             }
 
             fetch(`${API_BASE_URL}/api/staff/${staffId}`, {
-                method: 'DELETE'
+                method: 'DELETE',
+                headers: { 'x-admin-key': getAdminKey() }
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) throw new Error('Unauthorized or request failed');
+                return response.json();
+            })
             .then(data => {
                 alert('Staff member deleted successfully!');
                 fetchStaff();
             })
             .catch(error => {
                 console.error('Error deleting staff:', error);
-                alert('Failed to delete staff member.');
+                alert('Failed to delete staff member — check your admin key.');
+                sessionStorage.removeItem('adminKey');
             });
         }
 

@@ -4,10 +4,11 @@
 const express = require('express');
 const router = express.Router();
 const patronsController = require('../controllers/patronsController');
+const requireAdmin = require('../middleware/requireAdmin');
 
 router.get('/', patronsController.getAllPatrons);
 router.post('/', patronsController.addPatron);
-router.delete('/:patronID', patronsController.deletePatron);
+router.delete('/:patronID', requireAdmin, patronsController.deletePatron);
 router.put('/:patronID', patronsController.updatePatron);
 
 module.exports = router;

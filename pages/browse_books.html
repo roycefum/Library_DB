@@ -89,6 +89,17 @@
     <script>
         const API_BASE_URL = '';
 
+        // Returns the admin key for this session, prompting the user once
+        // if it isn't already stored. Needed for add/edit/delete actions.
+        function getAdminKey() {
+            let key = sessionStorage.getItem('adminKey');
+            if (!key) {
+                key = prompt('Enter admin key to make changes:');
+                if (key) sessionStorage.setItem('adminKey', key);
+            }
+            return key || '';
+        }
+
         // Fetch and display books on page load
         document.addEventListener("DOMContentLoaded", function() {
             fetchBooks();
@@ -144,12 +155,18 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData)
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) throw new Error('Request failed');
+                return response.json();
+            })
             .then(data => {
                 alert('Book updated successfully!');
                 fetchBooks();
             })
-            .catch(error => console.error('Error updating book:', error));
+            .catch(error => {
+                console.error('Error updating book:', error);
+                alert('Failed to update book.');
+            });
         }
 
         // Add new book to the database
@@ -177,26 +194,40 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData)
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) throw new Error('Request failed');
+                return response.json();
+            })
             .then(data => {
                 alert('Book added successfully!');
                 fetchBooks();
             })
-            .catch(error => console.error('Error adding book:', error));
+            .catch(error => {
+                console.error('Error adding book:', error);
+                alert('Failed to add book.');
+            });
             form.reset();
         }
 
         // Delete a book from the database
         function deleteBook(isbn) {
             fetch(`${API_BASE_URL}/api/books/${isbn}`, {
-                method: 'DELETE'
+                method: 'DELETE',
+                headers: { 'x-admin-key': getAdminKey() }
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) throw new Error('Unauthorized or request failed');
+                return response.json();
+            })
             .then(data => {
                 alert('Book deleted successfully!');
                 fetchBooks();
             })
-            .catch(error => console.error('Error deleting book:', error));
+            .catch(error => {
+                console.error('Error deleting book:', error);
+                alert('Failed to delete book — check your admin key.');
+                sessionStorage.removeItem('adminKey');
+            });
         }
 
         // Filter books displayed based on search input
