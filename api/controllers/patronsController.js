@@ -51,7 +51,7 @@ exports.updatePatron = async (req, res) => {
     const { firstName, lastName, email, membershipDate, address,phone } = req.body;
     try {
         const result = await executeQuery(
-            'UPDATE Patrons SET first_name = ?, last_name = ?, email = ?, membershipDate = ? WHERE patronID = ?',
+            'UPDATE Patrons SET first_name = ?, last_name = ?, email = ?, membershipDate = ?, address = ?, phone =? WHERE patronID = ?',
             [firstName, lastName, email, membershipDate, address, phone, patronID]
         );
         if (result.affectedRows) {
