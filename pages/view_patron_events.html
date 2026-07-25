@@ -73,7 +73,7 @@
                 <textarea id="editDescription"></textarea>
                 <label for="editStaffId">Staff (Required):</label>
                 <select id="editStaffId" required></select>
-                <button class="btn-submit" type="button" onclick="updateEvent()">Update</button>
+                <button class="btn-update" type="button" onclick="updateEvent()">Update</button>
             </fieldset>
         </form>
     </div>
@@ -471,7 +471,7 @@ function populatePatronEventsTable(events) {
             <td>${eventDate.toLocaleDateString()}</td>
             <td>${event.description}</td>
             <td>${event.staff_first} ${event.staff_last}</td>
-            <td style="color: ${isPast ? 'gray' : 'green'}">${isPast ? 'Past' : 'Upcoming'}</td>
+            <td style="color: ${isPast ? 'red' : 'green'}">${isPast ? 'Past' : 'Upcoming'}</td>
         `;
     });
 }
