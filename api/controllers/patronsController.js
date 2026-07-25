@@ -23,7 +23,7 @@ exports.addPatron = async (req, res) => {
     const { firstName, lastName, email, membershipDate, address, phone } = req.body;
     try {
         const result = await executeQuery(
-            'INSERT INTO Patrons (first_name, last_name, email, membershipDate, address, phone) VALUES (?, ?, ?, ?)',
+            'INSERT INTO Patrons (first_name, last_name, email, membershipDate, address, phone) VALUES (?, ?, ?, ?, ?, ?)',
             [firstName, lastName, email, membershipDate, address, phone]
         );
         res.json({ message: "Patron added successfully!", patronId: result.insertId });
