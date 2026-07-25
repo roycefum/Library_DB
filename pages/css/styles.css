@@ -152,6 +152,8 @@ input[type="number"] {
     border-radius: 4px;
     box-sizing: border-box;
 
+}
+
 /* ----- Prominent form action buttons ----- */
 .btn-submit,
 .btn-update {
@@ -177,4 +179,4 @@ input[type="number"] {
 .btn-update:hover {
     background-color: #2f6d46;
 }
-}
+
