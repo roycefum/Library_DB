@@ -64,7 +64,7 @@
                 <input type="number" id="publishedYear" name="publishedYear" required><br>
                 <label for="genre">Genre (Optional):</label><br>
                 <input type="text" id="genre" name="genre"><br><br>
-                <button type="button" onclick="addBook()">Submit</button>
+                <button type="button" class="btn-submit" onclick="addBook()">Submit</button>
             </fieldset>
         </form>
 
@@ -81,7 +81,7 @@
                 <input type="number" id="editPublishedYear" required><br>
                 <label for="editGenre">Genre (Optional):</label><br>
                 <input type="text" id="editGenre"><br>
-                <button type="button" onclick="updateBook()">Update</button>
+                <button type="button" class="btn-update" onclick="updateBook()">Update</button>
             </fieldset>
         </form>
     </div>
@@ -129,6 +129,8 @@
             document.getElementById('editAuthor').value = author || '';
             document.getElementById('editPublishedYear').value = publishedYear;
             document.getElementById('editGenre').value = genre || '';
+
+            document.getElementById('editBookForm').scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
         // Update book details in the database

@@ -151,4 +151,30 @@ input[type="number"] {
     border: 1px solid #ccc;
     border-radius: 4px;
     box-sizing: border-box;
+
+/* ----- Prominent form action buttons ----- */
+.btn-submit,
+.btn-update {
+    padding: 12px 28px;
+    font-size: 17px;
+    font-weight: bold;
+    border-radius: 6px;
+    margin-top: 5px;
+}
+
+.btn-submit {
+    background-color: var(--mediumBlue);
+}
+
+.btn-submit:hover {
+    background-color: #3a6f99;
+}
+
+.btn-update {
+    background-color: #3e8e5c;
+}
+
+.btn-update:hover {
+    background-color: #2f6d46;
+}
 }

@@ -20,11 +20,11 @@ exports.getAllPatrons = async (req, res) => {
 };
 
 exports.addPatron = async (req, res) => {
-    const { firstName, lastName, email, membershipDate } = req.body;
+    const { firstName, lastName, email, membershipDate, address, phone } = req.body;
     try {
         const result = await executeQuery(
-            'INSERT INTO Patrons (first_name, last_name, email, membershipDate) VALUES (?, ?, ?, ?)',
-            [firstName, lastName, email, membershipDate]
+            'INSERT INTO Patrons (first_name, last_name, email, membershipDate, address, phone) VALUES (?, ?, ?, ?)',
+            [firstName, lastName, email, membershipDate, address, phone]
         );
         res.json({ message: "Patron added successfully!", patronId: result.insertId });
     } catch (err) {
@@ -48,11 +48,11 @@ exports.deletePatron = async (req, res) => {
 
 exports.updatePatron = async (req, res) => {
     const { patronID } = req.params;
-    const { firstName, lastName, email, membershipDate } = req.body;
+    const { firstName, lastName, email, membershipDate, address,phone } = req.body;
     try {
         const result = await executeQuery(
             'UPDATE Patrons SET first_name = ?, last_name = ?, email = ?, membershipDate = ? WHERE patronID = ?',
-            [firstName, lastName, email, membershipDate, patronID]
+            [firstName, lastName, email, membershipDate, address, phone, patronID]
         );
         if (result.affectedRows) {
             res.json({ message: "Patron updated successfully!" });
